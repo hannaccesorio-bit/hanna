@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import Zoom from 'react-medium-image-zoom';
 import { useCart } from '../context/CartContext';
 import { fetchProducts } from '../services/api';
+import PhotoCard from './PhotoCard';
 import './ProductGallery.css';
 
-const ProductGallery = () => {
+const ProductGallery = ({ isAdmin = false, onDelete, onEdit }) => {
   const { addToCart } = useCart();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -12,7 +12,6 @@ const ProductGallery = () => {
   useEffect(() => {
     const loadProducts = async () => {
       const data = await fetchProducts();
-      // data should be an array of objects
       if (Array.isArray(data)) {
         setProducts(data);
       }
@@ -32,25 +31,13 @@ const ProductGallery = () => {
   return (
     <div className="grid-gallery">
       {products.map(product => (
-        <div key={product.id || product.nombre} className="premium-card product-card">
-          <div className="product-image-container">
-            <Zoom>
-              <img src={product.imagenUrl || product.imageUrl} alt={product.nombre || product.name} className="product-image" />
-            </Zoom>
-          </div>
-          <div className="product-info">
-            <h3 className="product-title">{product.nombre || product.name}</h3>
-            <p className="product-price">${product.precio || product.price}</p>
-            <button onClick={() => addToCart({
-              id: product.id,
-              name: product.nombre || product.name,
-              price: product.precio || product.price,
-              imageUrl: product.imagenUrl || product.imageUrl
-            })} className="btn-primary add-to-cart-btn">
-              Agregar al carrito
-            </button>
-          </div>
-        </div>
+        <PhotoCard
+          key={product.id || product.nombre}
+          product={product}
+          isAdmin={isAdmin}
+          onDelete={onDelete}
+          onEdit={onEdit}
+        />
       ))}
     </div>
   );

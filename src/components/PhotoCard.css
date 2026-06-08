@@ -1,0 +1,157 @@
+/* ================================================
+   PhotoCard & Thumbnail Grid
+   ================================================ */
+
+/* Grid container */
+.thumbnail-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 1.25rem;
+  padding: 0 1rem;
+}
+
+/* Card */
+.photo-card {
+  background-color: var(--color-surface);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.photo-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-premium);
+}
+
+/* Image wrapper */
+.photo-card-image {
+  position: relative;
+  width: 100%;
+  height: 150px;
+  overflow: hidden;
+  background-color: #f0f0f0;
+}
+.photo-card-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+.photo-card-image:hover img {
+  transform: scale(1.06);
+}
+
+/* Placeholder when no image */
+.photo-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.5rem;
+  color: #bbb;
+}
+
+/* Nueva Colección badge */
+.badge {
+  position: absolute;
+  top: 0.5rem;
+  left: 0.5rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.new-badge {
+  background: linear-gradient(135deg, #ff6f61, #ff9966);
+  color: #fff;
+  box-shadow: 0 2px 6px rgba(255, 111, 97, 0.4);
+}
+
+/* Admin buttons */
+.admin-buttons {
+  position: absolute;
+  top: 0.4rem;
+  right: 0.4rem;
+  display: flex;
+  gap: 0.3rem;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+.photo-card:hover .admin-buttons {
+  opacity: 1;
+}
+.admin-btn {
+  background: rgba(0, 0, 0, 0.6);
+  border: none;
+  color: #fff;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s ease;
+}
+.btn-delete { background: rgba(239, 68, 68, 0.85); }
+.btn-delete:hover { background: rgba(239, 68, 68, 1); }
+.btn-edit { background: rgba(59, 130, 246, 0.85); }
+.btn-edit:hover { background: rgba(59, 130, 246, 1); }
+
+/* Info section */
+.photo-card-info {
+  padding: 0.75rem;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+.photo-card-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--color-primary);
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.photo-card-price {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--color-accent);
+  margin: 0;
+}
+
+/* Availability badge */
+.availability-badge {
+  align-self: flex-start;
+  padding: 0.15rem 0.45rem;
+  border-radius: 4px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+.in-stock { background-color: var(--color-success); color: #fff; }
+.out-of-stock { background-color: var(--color-error); color: #fff; }
+
+/* Add to cart button */
+.add-btn {
+  margin-top: 0.5rem;
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.82rem;
+}
+
+/* ================================================
+   Hero Banner (16:9)
+   ================================================ */
+.hero-banner-container {
+  position: relative;
+  width: 100%;
+}
