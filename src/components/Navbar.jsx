@@ -8,17 +8,6 @@ import './Navbar.css';
 const menuItems = [
   { label: 'Inicio', path: '/' },
   {
-    label: 'Platería',
-    path: '/',
-    submenu: [
-      { label: 'Anillos', path: '/?cat=Anillos' },
-      { label: 'Dijes', path: '/?cat=Dijes' },
-      { label: 'Pulseras', path: '/?cat=Pulseras' },
-      { label: 'Cadenas', path: '/?cat=Cadenas' },
-      { label: 'Aretes', path: '/?cat=Aretes' },
-    ],
-  },
-  {
     label: 'Relojería',
     path: '/#colecciones',
     submenu: [

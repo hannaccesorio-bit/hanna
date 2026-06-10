@@ -50,13 +50,16 @@ const Home = () => {
   }, [products, searchQuery, categoryFilter]);
 
   const related = useMemo(() => {
-    if (!categoryFilter) return [];
-    return products
-      .filter(p => p.id !== categoryFilter && (
-        (p.departamento || p.department || '').toLowerCase() === categoryFilter.toLowerCase() ||
-        (p.categoria || p.category || '').toLowerCase() === categoryFilter.toLowerCase()
-      ))
-      .slice(0, 4);
+    if (categoryFilter) {
+      return products
+        .filter(p =>
+          (p.departamento || p.department || '').toLowerCase() === categoryFilter.toLowerCase() ||
+          (p.categoria || p.category || '').toLowerCase() === categoryFilter.toLowerCase()
+        )
+        .slice(0, 4);
+    }
+    const shuffled = [...products].sort(() => Math.random() - 0.5);
+    return shuffled.slice(0, 4);
   }, [products, categoryFilter]);
 
   const handleDelete = async (product) => {
