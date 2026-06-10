@@ -17,6 +17,7 @@ const Home = () => {
   const [categoryFilter, setCategoryFilter] = useState(searchParams.get('cat') || '');
   const [isAdmin] = useState(() => sessionStorage.getItem('admin_authenticated') === 'true');
   const [editProduct, setEditProduct] = useState(null);
+  const [openDept, setOpenDept] = useState(null);
 
   useEffect(() => {
     const load = async () => {
@@ -27,15 +28,19 @@ const Home = () => {
     load();
   }, []);
 
-  const categories = useMemo(() => {
-    const cats = new Set();
+  const departments = useMemo(() => {
+    const map = {};
     products.forEach(p => {
-      const d = p.departamento || p.department;
+      const d = p.departamento || p.department || 'General';
       const c = p.categoria || p.category;
-      if (d) cats.add(d);
-      if (c) cats.add(c);
+      if (!map[d]) map[d] = new Set();
+      if (c && c !== d) map[d].add(c);
     });
-    return Array.from(cats);
+    const result = [];
+    for (const dep in map) {
+      result.push({ name: dep, categories: Array.from(map[dep]) });
+    }
+    return result;
   }, [products]);
 
   const filtered = useMemo(() => {
@@ -127,15 +132,33 @@ const Home = () => {
             className="input-field search-input"
             style={{ maxWidth: '300px', paddingLeft: '1rem' }}
           />
-          {categories.map((cat) => (
-            <button
-              key={cat}
-              onClick={() => handleCategoryChange(cat)}
-              className={categoryFilter === cat ? 'btn-accent' : 'btn-primary'}
-              style={{ fontSize: '0.85rem', padding: '0.4rem 1rem' }}
+          {departments.map((dep) => (
+            <div key={dep.name} style={{ position: 'relative', display: 'inline-block' }}
+              onMouseEnter={() => setOpenDept(dep.name)}
+              onMouseLeave={() => setOpenDept(null)}
             >
-              {cat}
-            </button>
+              <button
+                onClick={() => handleCategoryChange(dep.name)}
+                className={categoryFilter === dep.name ? 'btn-accent' : 'btn-primary'}
+                style={{ fontSize: '0.85rem', padding: '0.4rem 1rem' }}
+              >
+                {dep.name} {dep.categories.length > 0 && ' ▾'}
+              </button>
+              {openDept === dep.name && dep.categories.length > 0 && (
+                <div style={{ position: 'absolute', top: '100%', left: '50%', transform: 'translateX(-50%)', background: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-md)', boxShadow: 'var(--shadow-premium)', minWidth: '140px', padding: '0.4rem', zIndex: 50, animation: 'fadeIn 0.15s ease' }}>
+                  {dep.categories.map(cat => (
+                    <button key={cat}
+                      onClick={() => handleCategoryChange(cat)}
+                      style={{ display: 'block', width: '100%', padding: '0.4rem 0.8rem', border: 'none', background: categoryFilter === cat ? 'var(--color-accent)' : 'transparent', color: categoryFilter === cat ? '#111' : 'var(--color-text)', borderRadius: '6px', cursor: 'pointer', fontSize: '0.85rem', textAlign: 'left', fontFamily: 'var(--font-sans)' }}
+                      onMouseEnter={e => { if (categoryFilter !== cat) e.target.style.background = 'var(--color-bg)' }}
+                      onMouseLeave={e => { if (categoryFilter !== cat) e.target.style.background = 'transparent' }}
+                    >
+                      {cat}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
           ))}
         </div>
 
