@@ -41,7 +41,9 @@ const Home = () => {
   const filtered = useMemo(() => {
     return products.filter((p) => {
       const name = (p.nombre || p.name || '').toLowerCase();
-      const matchesSearch = !searchQuery || name.includes(searchQuery.toLowerCase());
+      const ref = (p.referencia || '').toLowerCase();
+      const id = String(p.id || '');
+      const matchesSearch = !searchQuery || name.includes(searchQuery.toLowerCase()) || ref.includes(searchQuery.toLowerCase()) || id.includes(searchQuery.toLowerCase());
       const matchesCategory = !categoryFilter ||
         (p.departamento || p.department || '').toLowerCase() === categoryFilter.toLowerCase() ||
         (p.categoria || p.category || '').toLowerCase() === categoryFilter.toLowerCase();

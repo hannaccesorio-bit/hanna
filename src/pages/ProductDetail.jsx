@@ -96,7 +96,7 @@ export default function ProductDetail() {
   const description = product.descripcion || product.description || '';
   const originalPrice = product.precioOriginal || product.originalPrice;
   const hasDiscount = originalPrice && Number(originalPrice) > Number(price);
-  const sku = product.sku || product.id || '';
+  const sku = product.referencia || product.sku || product.id || '';
 
   const whatsappMsg = `Hola Hanna Accesorios! Me interesa este producto:%0A*${name}*%0APrecio: $${price}%0ACódigo: ${sku}%0A%0A¿Está disponible?`;
 

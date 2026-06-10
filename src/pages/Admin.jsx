@@ -17,7 +17,7 @@ const Admin = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [tab, setTab] = useState('products');
 
-  const [product, setProduct] = useState({ name: '', price: '', department: '', category: '' });
+  const [product, setProduct] = useState({ name: '', price: '', department: '', category: '', referencia: '' });
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
   const [trashed, setTrashed] = useState(loadTrash);
@@ -100,7 +100,7 @@ const Admin = () => {
     const success = await createProduct({ ...product, imageUrl });
     if (success) {
       toast.success('Producto agregado');
-      setProduct({ name: '', price: '', department: '', category: '' });
+      setProduct({ name: '', price: '', department: '', category: '', referencia: '' });
       setImageFile(null); setImagePreview(null);
       loadProducts();
     } else {
@@ -206,6 +206,7 @@ const Admin = () => {
           <p style={{ color: 'var(--color-text-muted)', marginBottom: '2rem' }}>Añade nuevos productos a tu catálogo</p>
           <form onSubmit={handleAddProduct} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
             <input type="text" placeholder="Nombre del Producto" className="input-field" required value={product.name} onChange={e => setProduct({...product, name: e.target.value})} />
+            <input type="text" placeholder="Referencia / SKU (Código único)" className="input-field" value={product.referencia} onChange={e => setProduct({...product, referencia: e.target.value})} />
             <input type="number" placeholder="Precio ($)" className="input-field" required value={product.price} onChange={e => setProduct({...product, price: e.target.value})} />
             <div style={{ display: 'flex', gap: '1rem' }}>
               <input type="text" placeholder="Departamento (Ej. Platería)" className="input-field" required list="dep-list" value={product.department} onChange={e => setProduct({...product, department: e.target.value})} />
