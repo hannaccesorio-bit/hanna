@@ -4,10 +4,11 @@ import { useCart } from '../context/CartContext';
 import { jsPDF } from 'jspdf';
 import { autoTable } from 'jspdf-autotable';
 import { sendOrder } from '../services/api';
+import { Plus, Minus, Trash2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const Checkout = () => {
-  const { cart, totalItems, totalPrice, clearCart } = useCart();
+  const { cart, totalItems, totalPrice, clearCart, updateQuantity, removeFromCart } = useCart();
   const [customer, setCustomer] = useState({ name: '', phone: '', address: '' });
   const [isProcessing, setIsProcessing] = useState(false);
 
@@ -41,7 +42,7 @@ const Checkout = () => {
     const finalY = doc.lastAutoTable.finalY || 70;
     doc.setFontSize(14);
     doc.text(`Total a Pagar: $${totalPrice}`, 14, finalY + 15);
-    doc.save('factura_hannaccesorio.pdf');
+    doc.save('factura_hanna_accesorios.pdf');
   };
 
   const handleCheckout = async (e) => {
@@ -92,15 +93,27 @@ const Checkout = () => {
         <div style={{ flex: '2 1 400px' }}>
           <h3 style={{ marginBottom: '1rem' }}>Tus Productos</h3>
           {cart.map(item => (
-            <div key={item.id} className="premium-card" style={{ display: 'flex', padding: '1rem', marginBottom: '1rem', alignItems: 'center' }}>
-              <img src={item.imageUrl} alt={item.name} style={{ width: '80px', height: '80px', objectFit: 'cover', borderRadius: '8px' }} />
-              <div style={{ flex: 1, marginLeft: '1rem' }}>
-                <h4>{item.name}</h4>
-                <p style={{ color: 'var(--color-text-muted)' }}>Cantidad: {item.quantity}</p>
+            <div key={item.id} className="premium-card" style={{ display: 'flex', padding: '1rem', marginBottom: '1rem', alignItems: 'center', gap: '1rem' }}>
+              <img src={item.imageUrl} alt={item.name} style={{ width: '70px', height: '70px', objectFit: 'cover', borderRadius: '8px' }} />
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <h4 style={{ fontSize: '0.95rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{item.name}</h4>
+                <p style={{ color: 'var(--color-accent)', fontWeight: 700, marginTop: '0.2rem' }}>${item.price}</p>
               </div>
-              <div style={{ textAlign: 'right' }}>
-                <p style={{ fontWeight: 'bold', fontSize: '1.2rem' }}>${item.price * item.quantity}</p>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+                <button className="qty-btn" onClick={() => updateQuantity(item.id, item.quantity - 1)} style={{ padding: '0.4rem 0.6rem' }}>
+                  <Minus size={14} />
+                </button>
+                <span className="qty-value" style={{ padding: '0.4rem 0.8rem', fontSize: '0.9rem', minWidth: '2rem' }}>{item.quantity}</span>
+                <button className="qty-btn" onClick={() => updateQuantity(item.id, item.quantity + 1)} style={{ padding: '0.4rem 0.6rem' }}>
+                  <Plus size={14} />
+                </button>
               </div>
+              <div style={{ textAlign: 'right', minWidth: '70px' }}>
+                <p style={{ fontWeight: 'bold', fontSize: '1.1rem' }}>${item.price * item.quantity}</p>
+              </div>
+              <button onClick={() => { removeFromCart(item.id); toast('Producto eliminado', { icon: '🗑️' }); }} className="btn-icon" style={{ color: 'var(--color-error)' }}>
+                <Trash2 size={18} />
+              </button>
             </div>
           ))}
           <p style={{ fontWeight: 'bold', fontSize: '1.3rem', textAlign: 'right', marginTop: '1rem' }}>

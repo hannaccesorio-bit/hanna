@@ -1,12 +1,11 @@
-/* AlertBanner – warning strip overlaid on the hero banner */
 .alert-banner {
   width: 100%;
-  background: linear-gradient(90deg, rgba(255, 140, 0, 0.95), rgba(255, 80, 0, 0.9));
-  color: #fff;
+  background: linear-gradient(90deg, rgba(212, 175, 55, 0.95), rgba(180, 140, 30, 0.9));
+  color: #111;
   text-align: center;
   padding: 0.6rem 1.5rem;
   font-weight: 700;
   font-size: 0.95rem;
   letter-spacing: 0.5px;
-  box-shadow: 0 2px 8px rgba(255, 140, 0, 0.3);
+  box-shadow: 0 2px 8px rgba(212, 175, 55, 0.3);
 }
