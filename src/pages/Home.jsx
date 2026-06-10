@@ -49,19 +49,6 @@ const Home = () => {
     });
   }, [products, searchQuery, categoryFilter]);
 
-  const related = useMemo(() => {
-    if (categoryFilter) {
-      return products
-        .filter(p =>
-          (p.departamento || p.department || '').toLowerCase() === categoryFilter.toLowerCase() ||
-          (p.categoria || p.category || '').toLowerCase() === categoryFilter.toLowerCase()
-        )
-        .slice(0, 4);
-    }
-    const shuffled = [...products].sort(() => Math.random() - 0.5);
-    return shuffled.slice(0, 4);
-  }, [products, categoryFilter]);
-
   const handleDelete = async (product) => {
     if (window.confirm(`¿Eliminar "${product.nombre || product.name}"?`)) {
       const ok = await deleteProductApi(product.id);
@@ -173,21 +160,6 @@ const Home = () => {
           </div>
         )}
 
-        {related.length > 0 && (
-          <div style={{ marginTop: '4rem' }}>
-            <h3 style={{ fontSize: '1.5rem', marginBottom: '1.5rem', textAlign: 'center' }}>También te puede gustar</h3>
-            <div className="thumbnail-grid">
-              {related.map((product) => (
-                <PhotoCard
-                  key={product.id || product.nombre}
-                  product={product}
-                  isAdmin={false}
-                  onAddToCart={addToCart}
-                />
-              ))}
-            </div>
-          </div>
-        )}
       </section>
 
       {editProduct && (
