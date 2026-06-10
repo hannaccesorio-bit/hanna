@@ -33,8 +33,12 @@ export const fetchProducts = async () => {
 
 export const loginAdmin = async (password) => {
   try {
-    const response = await fetch(`${API_URL}?action=login&password=${encodeURIComponent(password)}`);
+    const response = await fetch(API_URL, {
+      method: 'POST',
+      body: JSON.stringify({ action: 'login', password }),
+    });
     const text = await response.text();
+    console.log('Login raw response:', text.substring(0, 200));
     const result = JSON.parse(text);
     return result.success;
   } catch (error) {
