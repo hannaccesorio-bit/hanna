@@ -111,7 +111,7 @@ const Home = () => {
       </Helmet>
 
       <section className="hero-banner-container">
-        <div className="hero-section">
+        <div className="hero-section" style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1603569283847-5f1c6ef6e19b?auto=format&fit=crop&q=80&w=2000)' }}>
           <div className="hero-overlay">
             <h1 className="hero-title">Nueva Colección</h1>
             <p className="hero-subtitle">

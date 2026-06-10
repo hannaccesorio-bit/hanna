@@ -184,11 +184,6 @@
   color: var(--color-accent);
 }
 
-.hero-banner-container {
-  position: relative;
-  width: 100%;
-}
-
 @media (max-width: 768px) {
   .thumbnail-grid {
     grid-template-columns: repeat(2, 1fr);
