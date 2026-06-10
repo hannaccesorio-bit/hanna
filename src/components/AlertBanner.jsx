@@ -1,4 +1,3 @@
-import React from 'react';
 import './AlertBanner.css';
 
 export default function AlertBanner({ message }) {

@@ -1,49 +1,111 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
+import { Helmet } from 'react-helmet-async';
+import { useSearchParams } from 'react-router-dom';
 import PhotoCard from '../components/PhotoCard';
 import AlertBanner from '../components/AlertBanner';
-import { fetchProducts } from '../services/api';
+import SkeletonCard from '../components/SkeletonCard';
+import { fetchProducts, deleteProduct as deleteProductApi } from '../services/api';
 import { useCart } from '../context/CartContext';
-
-// Temporary admin flag – replace with real auth logic later
-const isAdmin = true;
+import toast from 'react-hot-toast';
 
 const Home = () => {
   const { addToCart } = useCart();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '');
+  const [categoryFilter, setCategoryFilter] = useState(searchParams.get('cat') || '');
+  const [isAdmin] = useState(() => sessionStorage.getItem('admin_authenticated') === 'true');
+  const [editProduct, setEditProduct] = useState(null);
 
   useEffect(() => {
-    const loadProducts = async () => {
+    const load = async () => {
       const data = await fetchProducts();
       setProducts(Array.isArray(data) ? data : []);
       setLoading(false);
     };
-    loadProducts();
+    load();
   }, []);
 
-  const handleDelete = (product) => {
-    // Placeholder – integrate with backend delete API
+  const categories = useMemo(() => {
+    const cats = new Set();
+    products.forEach(p => {
+      const d = p.departamento || p.department;
+      const c = p.categoria || p.category;
+      if (d) cats.add(d);
+      if (c) cats.add(c);
+    });
+    return Array.from(cats);
+  }, [products]);
+
+  const filtered = useMemo(() => {
+    return products.filter((p) => {
+      const name = (p.nombre || p.name || '').toLowerCase();
+      const matchesSearch = !searchQuery || name.includes(searchQuery.toLowerCase());
+      const matchesCategory = !categoryFilter ||
+        (p.departamento || p.department || '').toLowerCase() === categoryFilter.toLowerCase() ||
+        (p.categoria || p.category || '').toLowerCase() === categoryFilter.toLowerCase();
+      return matchesSearch && matchesCategory;
+    });
+  }, [products, searchQuery, categoryFilter]);
+
+  const related = useMemo(() => {
+    if (!categoryFilter) return [];
+    return products
+      .filter(p => p.id !== categoryFilter && (
+        (p.departamento || p.department || '').toLowerCase() === categoryFilter.toLowerCase() ||
+        (p.categoria || p.category || '').toLowerCase() === categoryFilter.toLowerCase()
+      ))
+      .slice(0, 4);
+  }, [products, categoryFilter]);
+
+  const handleDelete = async (product) => {
     if (window.confirm(`¿Eliminar "${product.nombre || product.name}"?`)) {
-      setProducts(prev => prev.filter(p => p.id !== product.id));
+      const ok = await deleteProductApi(product.id);
+      if (ok) {
+        setProducts(prev => prev.filter(p => p.id !== product.id));
+        toast.success('Producto eliminado');
+      } else {
+        toast.error('Error al eliminar el producto');
+      }
     }
   };
 
   const handleEdit = (product) => {
-    // Placeholder – open edit modal
-    alert(`Editar: ${product.nombre || product.name}`);
+    setEditProduct(product);
   };
 
-  if (loading) {
-    return (
-      <div style={{ textAlign: 'center', padding: '4rem', fontSize: '1.2rem', color: 'var(--color-text-muted)' }}>
-        Cargando catálogo premium...
-      </div>
-    );
-  }
+  const handleSaveEdit = async (e) => {
+    e.preventDefault();
+    if (!editProduct) return;
+    const ok = await deleteProductApi(editProduct.id);
+    if (ok) {
+      toast.success('Producto actualizado (requiere reconexión del backend)');
+      setEditProduct(null);
+    } else {
+      toast.error('Error al actualizar');
+    }
+  };
+
+  const handleSearchChange = (q) => {
+    setSearchQuery(q);
+    if (q) setSearchParams({ q });
+    else setSearchParams({});
+  };
+
+  const handleCategoryChange = (cat) => {
+    setCategoryFilter(cat === categoryFilter ? '' : cat);
+    if (cat) setSearchParams({ cat });
+    else setSearchParams({});
+  };
 
   return (
     <div>
-      {/* Hero banner full-width 16:9 */}
+      <Helmet>
+        <title>Hannaccesorio - Catálogo Premium</title>
+        <meta name="description" content="Descubre los accesorios más exclusivos y premium diseñados para deslumbrar." />
+      </Helmet>
+
       <section className="hero-banner-container">
         <div className="hero-section">
           <div className="hero-overlay">
@@ -57,15 +119,41 @@ const Home = () => {
         <AlertBanner message="✨ ¡Acceso exclusivo! Solo para usuarios premium." />
       </section>
 
-      {/* Destacados grid */}
       <section style={{ padding: '4rem 0' }} id="colecciones">
-        <h2 style={{ fontSize: '2rem', marginBottom: '2rem', textAlign: 'center' }}>Destacados</h2>
+        <h2 style={{ fontSize: '2rem', marginBottom: '1.5rem', textAlign: 'center' }}>Destacados</h2>
 
-        {products.length === 0 ? (
-          <p style={{ textAlign: 'center', color: 'var(--color-text-muted)' }}>No hay productos destacados aún.</p>
+        <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', justifyContent: 'center', marginBottom: '2rem' }}>
+          <input
+            type="text"
+            placeholder="Buscar productos..."
+            value={searchQuery}
+            onChange={(e) => handleSearchChange(e.target.value)}
+            className="input-field search-input"
+            style={{ maxWidth: '300px', paddingLeft: '1rem' }}
+          />
+          {categories.map((cat) => (
+            <button
+              key={cat}
+              onClick={() => handleCategoryChange(cat)}
+              className={categoryFilter === cat ? 'btn-accent' : 'btn-primary'}
+              style={{ fontSize: '0.85rem', padding: '0.4rem 1rem' }}
+            >
+              {cat}
+            </button>
+          ))}
+        </div>
+
+        {loading ? (
+          <div className="thumbnail-grid">
+            {Array.from({ length: 8 }).map((_, i) => <SkeletonCard key={i} />)}
+          </div>
+        ) : filtered.length === 0 ? (
+          <p style={{ textAlign: 'center', color: 'var(--color-text-muted)', padding: '2rem' }}>
+            {products.length === 0 ? 'No hay productos destacados aún.' : 'No se encontraron productos con esos filtros.'}
+          </p>
         ) : (
           <div className="thumbnail-grid">
-            {products.map(product => (
+            {filtered.map((product) => (
               <PhotoCard
                 key={product.id || product.nombre}
                 product={product}
@@ -77,7 +165,39 @@ const Home = () => {
             ))}
           </div>
         )}
+
+        {related.length > 0 && (
+          <div style={{ marginTop: '4rem' }}>
+            <h3 style={{ fontSize: '1.5rem', marginBottom: '1.5rem', textAlign: 'center' }}>También te puede gustar</h3>
+            <div className="thumbnail-grid">
+              {related.map((product) => (
+                <PhotoCard
+                  key={product.id || product.nombre}
+                  product={product}
+                  isAdmin={false}
+                  onAddToCart={addToCart}
+                />
+              ))}
+            </div>
+          </div>
+        )}
       </section>
+
+      {editProduct && (
+        <div className="modal-overlay" onClick={() => setEditProduct(null)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <h3>Editar Producto</h3>
+            <form onSubmit={handleSaveEdit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginTop: '1rem' }}>
+              <input className="input-field" defaultValue={editProduct.nombre || editProduct.name} placeholder="Nombre" />
+              <input className="input-field" defaultValue={editProduct.precio || editProduct.price} placeholder="Precio" type="number" />
+              <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
+                <button type="button" className="btn-primary" onClick={() => setEditProduct(null)}>Cancelar</button>
+                <button type="submit" className="btn-accent">Guardar</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

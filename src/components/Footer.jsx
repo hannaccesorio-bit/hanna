@@ -1,16 +1,15 @@
-import React from 'react';
-import { MapPin, Phone } from 'lucide-react';
+import { MapPin, Phone, Camera, MessageCircle, Globe } from 'lucide-react';
 import './Footer.css';
 
 const Footer = () => {
   return (
     <footer className="premium-footer">
       <div className="footer-container">
-        
+
         <div className="footer-section">
           <h3 className="footer-title">Nuestra Visión</h3>
           <p className="footer-text">
-            Brindar elegancia y distinción a través de accesorios de joyería exclusivos. 
+            Brindar elegancia y distinción a través de accesorios de joyería exclusivos.
             Creemos que cada detalle cuenta para resaltar tu belleza natural con piezas únicas y de la más alta calidad.
           </p>
         </div>
@@ -32,11 +31,14 @@ const Footer = () => {
         <div className="footer-section">
           <h3 className="footer-title">Redes Sociales</h3>
           <div className="social-links">
-            <a href="#" className="social-link" aria-label="Instagram">
-              <span style={{ fontSize: '24px' }}>📸</span>
+            <a href="https://instagram.com/hannaccesorio" target="_blank" rel="noopener noreferrer" className="social-link" aria-label="Instagram">
+              <Camera size={24} />
             </a>
-            <a href="#" className="social-link" aria-label="Facebook">
-              <span style={{ fontSize: '24px' }}>📘</span>
+            <a href="https://facebook.com/hannaccesorio" target="_blank" rel="noopener noreferrer" className="social-link" aria-label="Facebook">
+              <Globe size={24} />
+            </a>
+            <a href="https://wa.me/584123853699" target="_blank" rel="noopener noreferrer" className="social-link" aria-label="WhatsApp">
+              <MessageCircle size={24} />
             </a>
           </div>
         </div>

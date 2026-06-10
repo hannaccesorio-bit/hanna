@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
+import { Helmet } from 'react-helmet-async';
 import { useCart } from '../context/CartContext';
 import { jsPDF } from 'jspdf';
-import 'jspdf-autotable';
+import { autoTable } from 'jspdf-autotable';
 import { sendOrder } from '../services/api';
+import toast from 'react-hot-toast';
 
 const Checkout = () => {
   const { cart, totalItems, totalPrice, clearCart } = useCart();
@@ -11,89 +13,84 @@ const Checkout = () => {
 
   const generatePDF = () => {
     const doc = new jsPDF();
-    
-    // Header
     doc.setFontSize(20);
     doc.text('HANNACCESORIO', 14, 22);
     doc.setFontSize(12);
     doc.text('TICKET DE COMPRA', 14, 30);
     doc.text(`Fecha: ${new Date().toLocaleDateString()}`, 14, 38);
-    
-    // Customer Info
     doc.text(`Cliente: ${customer.name}`, 14, 50);
     doc.text(`Teléfono: ${customer.phone}`, 14, 56);
     doc.text(`Dirección: ${customer.address}`, 14, 62);
 
-    // Table
     const tableColumn = ["Producto", "Cantidad", "Precio Unitario", "Subtotal"];
-    const tableRows = [];
+    const tableRows = cart.map(item => [
+      item.name,
+      item.quantity.toString(),
+      `$${item.price}`,
+      `$${item.price * item.quantity}`
+    ]);
 
-    cart.forEach(item => {
-      const rowData = [
-        item.name,
-        item.quantity.toString(),
-        `$${item.price}`,
-        `$${item.price * item.quantity}`
-      ];
-      tableRows.push(rowData);
-    });
-
-    doc.autoTable({
+    autoTable(doc, {
       startY: 70,
       head: [tableColumn],
       body: tableRows,
       theme: 'grid',
-      headStyles: { fillColor: [212, 175, 55] }, // Gold accent
+      headStyles: { fillColor: [212, 175, 55] },
     });
 
-    // Total
     const finalY = doc.lastAutoTable.finalY || 70;
     doc.setFontSize(14);
     doc.text(`Total a Pagar: $${totalPrice}`, 14, finalY + 15);
-    
     doc.save('factura_hannaccesorio.pdf');
   };
 
   const handleCheckout = async (e) => {
     e.preventDefault();
     if (!customer.name || !customer.phone) {
-      alert("Por favor ingresa tu nombre y teléfono.");
+      toast.error('Por favor ingresa tu nombre y teléfono.');
       return;
     }
-    
+
     setIsProcessing(true);
 
-    // Generate PDF Invoice
-    generatePDF();
+    try {
+      generatePDF();
+      toast.success('Factura generada');
 
-    // Send order to Google Sheets via API
-    await sendOrder({
-      customer,
-      cart,
-      totalPrice,
-      date: new Date().toISOString()
-    });
+      const orderResult = await sendOrder({ customer, cart, totalPrice, date: new Date().toISOString() });
+      if (!orderResult) {
+        toast('No se pudo guardar en la nube, pero tu pedido se enviará por WhatsApp', { icon: '⚠️' });
+      }
 
-    // Format WhatsApp Message
-    const message = `Hola Hannaccesorio!%0AQuiero realizar un pedido.%0A%0AMi nombre: ${customer.name}%0ATeléfono: ${customer.phone}%0ADirección: ${customer.address}%0A%0APedido:%0A${cart.map(item => `- ${item.quantity}x ${item.name} ($${item.price * item.quantity})`).join('%0A')}%0A%0A*Total: $${totalPrice}*%0A%0A¡Ya tengo la factura generada!`;
-    const whatsappUrl = `https://wa.me/584123853699?text=${message}`; 
-    
-    window.open(whatsappUrl, '_blank');
-    
-    clearCart();
-    setIsProcessing(false);
+      const message = `Hola Hannaccesorio!%0AQuiero realizar un pedido.%0A%0AMi nombre: ${customer.name}%0ATeléfono: ${customer.phone}%0ADirección: ${customer.address}%0A%0APedido:%0A${cart.map(item => `- ${item.quantity}x ${item.name} ($${item.price * item.quantity})`).join('%0A')}%0A%0A*Total: $${totalPrice}*%0A%0A¡Ya tengo la factura generada!`;
+      window.open(`https://wa.me/584123853699?text=${message}`, '_blank');
+
+      clearCart();
+      toast.success('Pedido enviado con éxito');
+    } catch (err) {
+      toast.error(`Error: ${err.message || 'Intenta de nuevo'}`);
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   if (cart.length === 0) {
-    return <div style={{ textAlign: 'center', padding: '4rem' }}><h2>Tu carrito está vacío</h2></div>;
+    return (
+      <div style={{ textAlign: 'center', padding: '4rem' }}>
+        <Helmet><title>Carrito - Hannaccesorio</title></Helmet>
+        <h2>Tu carrito está vacío</h2>
+        <p style={{ color: 'var(--color-text-muted)', marginTop: '1rem' }}>Agrega productos desde el catálogo para comenzar.</p>
+      </div>
+    );
   }
 
   return (
     <div>
-      <h2 style={{ marginBottom: '2rem' }}>Finalizar Compra</h2>
+      <Helmet><title>Finalizar Compra - Hannaccesorio</title></Helmet>
+      <h2 style={{ marginBottom: '2rem' }}>Finalizar Compra ({totalItems} productos)</h2>
       <div style={{ display: 'flex', gap: '2rem', flexWrap: 'wrap' }}>
         <div style={{ flex: '2 1 400px' }}>
-          <h3>Tus Productos</h3>
+          <h3 style={{ marginBottom: '1rem' }}>Tus Productos</h3>
           {cart.map(item => (
             <div key={item.id} className="premium-card" style={{ display: 'flex', padding: '1rem', marginBottom: '1rem', alignItems: 'center' }}>
               <img src={item.imageUrl} alt={item.name} style={{ width: '80px', height: '80px', objectFit: 'cover', borderRadius: '8px' }} />
@@ -106,6 +103,9 @@ const Checkout = () => {
               </div>
             </div>
           ))}
+          <p style={{ fontWeight: 'bold', fontSize: '1.3rem', textAlign: 'right', marginTop: '1rem' }}>
+            Total: ${totalPrice}
+          </p>
         </div>
         <div className="premium-card" style={{ flex: '1 1 300px', padding: '2rem', height: 'fit-content' }}>
           <h3>Datos de Envío</h3>
@@ -113,10 +113,10 @@ const Checkout = () => {
             <input type="text" placeholder="Nombre Completo" className="input-field" value={customer.name} onChange={e => setCustomer({...customer, name: e.target.value})} required />
             <input type="tel" placeholder="Teléfono / WhatsApp" className="input-field" value={customer.phone} onChange={e => setCustomer({...customer, phone: e.target.value})} required />
             <input type="text" placeholder="Dirección de Envío" className="input-field" value={customer.address} onChange={e => setCustomer({...customer, address: e.target.value})} />
-            
+
             <hr style={{ margin: '1rem 0', borderColor: 'var(--color-border)' }} />
             <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 'bold', fontSize: '1.5rem', marginBottom: '1rem' }}>
-              <span>Total a Pagar</span>
+              <span>Total</span>
               <span>${totalPrice}</span>
             </div>
             <button type="submit" className="btn-accent" style={{ width: '100%' }} disabled={isProcessing}>

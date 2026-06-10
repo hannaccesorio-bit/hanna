@@ -1,4 +1,3 @@
-import React from 'react';
 import { useLocation } from 'react-router-dom';
 
 // Simple invoice view – in real app replace with proper data fetching
