@@ -10,6 +10,10 @@ export default class ErrorBoundary extends React.Component {
     return { hasError: true, error };
   }
 
+  componentDidCatch(error, info) {
+    console.error('ErrorBoundary caught:', error, info);
+  }
+
   render() {
     if (this.state.hasError) {
       return (
@@ -21,9 +25,18 @@ export default class ErrorBoundary extends React.Component {
           <button
             onClick={() => window.location.reload()}
             className="btn-primary"
+            style={{ marginBottom: '1rem' }}
           >
             Recargar página
           </button>
+          <details style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)', cursor: 'pointer' }}>
+            <summary>Ver detalle técnico</summary>
+            <pre style={{ textAlign: 'left', marginTop: '0.5rem', padding: '0.5rem', background: '#f5f5f5', borderRadius: '4px', overflowX: 'auto', fontSize: '0.75rem', color: '#333' }}>
+              {this.state.error?.message || 'Error desconocido'}
+              {'\n'}
+              {this.state.error?.stack || ''}
+            </pre>
+          </details>
         </div>
       );
     }
