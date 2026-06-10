@@ -111,7 +111,7 @@ const Home = () => {
       </Helmet>
 
       <section className="hero-banner-container">
-        <div className="hero-section" style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1603569283847-5f1c6ef6e19b?auto=format&fit=crop&q=80&w=2000)' }}>
+        <div className="hero-section" style={{ backgroundImage: 'url(https://www.mojecafe.pl/wp-content/uploads/2024/12/co-oznaczaja-dwie-obraczki-na-palcu-1.png)' }}>
           <div className="hero-overlay">
             <h1 className="hero-title">Nueva Colección</h1>
             <p className="hero-subtitle">
@@ -124,7 +124,7 @@ const Home = () => {
       </section>
 
       <section style={{ padding: '4rem 0' }} id="colecciones">
-        <h2 style={{ fontSize: '2rem', marginBottom: '1.5rem', textAlign: 'center' }}>Destacados</h2>
+        <h2 style={{ fontSize: '2rem', marginBottom: '1.5rem', textAlign: 'center' }}>Colección</h2>
 
         <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', justifyContent: 'center', marginBottom: '2rem' }}>
           <input

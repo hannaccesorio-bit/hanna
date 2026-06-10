@@ -1,11 +1,11 @@
 .alert-banner {
   width: 100%;
-  background: linear-gradient(90deg, rgba(212, 175, 55, 0.95), rgba(180, 140, 30, 0.9));
-  color: #111;
+  background: linear-gradient(90deg, rgba(80, 80, 80, 0.95), rgba(50, 50, 50, 0.9));
+  color: #fff;
   text-align: center;
   padding: 0.6rem 1.5rem;
   font-weight: 700;
   font-size: 0.95rem;
   letter-spacing: 0.5px;
-  box-shadow: 0 2px 8px rgba(212, 175, 55, 0.3);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }

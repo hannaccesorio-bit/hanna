@@ -18,7 +18,15 @@ const menuItems = [
       { label: 'Aretes', path: '/?cat=Aretes' },
     ],
   },
-  { label: 'Colección', path: '/#colecciones' },
+  {
+    label: 'Relojería',
+    path: '/#colecciones',
+    submenu: [
+      { label: 'Yess', path: '/?cat=Yess' },
+      { label: 'Clásicos', path: '/?cat=Clásicos' },
+      { label: 'Deportivos', path: '/?cat=Deportivos' },
+    ],
+  },
 ];
 
 const Navbar = ({ onSearch }) => {
