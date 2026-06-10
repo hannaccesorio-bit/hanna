@@ -5,7 +5,7 @@ import './PhotoCard.css';
 
 const PHONE = '584123853699';
 
-const PhotoCard = ({ product, isAdmin = false, onDelete, onEdit, onAddToCart }) => {
+const PhotoCard = ({ product, isAdmin = false, onDelete, onAddToCart }) => {
   const name = product.nombre || product.name || 'Sin nombre';
   const price = product.precio || product.price || '0';
   const imageUrl = product.imagenUrl || product.imageUrl || '';
@@ -36,7 +36,7 @@ const PhotoCard = ({ product, isAdmin = false, onDelete, onEdit, onAddToCart }) 
           {isAdmin && (
             <div className="admin-buttons">
               <button className="admin-btn btn-delete" onClick={(e) => { e.preventDefault(); onDelete && onDelete(product); }} title="Eliminar">✕</button>
-              <button className="admin-btn btn-edit" onClick={(e) => { e.preventDefault(); onEdit && onEdit(product); }} title="Editar">✎</button>
+
             </div>
           )}
         </div>

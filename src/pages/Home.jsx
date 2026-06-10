@@ -16,7 +16,6 @@ const Home = () => {
   const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '');
   const [categoryFilter, setCategoryFilter] = useState(searchParams.get('cat') || '');
   const [isAdmin] = useState(() => sessionStorage.getItem('admin_authenticated') === 'true');
-  const [editProduct, setEditProduct] = useState(null);
   const [openDept, setOpenDept] = useState(null);
 
   useEffect(() => {
@@ -69,22 +68,6 @@ const Home = () => {
         setProducts(prev => prev.filter(p => p.id !== product.id));
         toast('Producto movido a la papelera (local)', { icon: '🗑️' });
       }
-    }
-  };
-
-  const handleEdit = (product) => {
-    setEditProduct(product);
-  };
-
-  const handleSaveEdit = async (e) => {
-    e.preventDefault();
-    if (!editProduct) return;
-    const ok = await deleteProductApi(editProduct.id);
-    if (ok) {
-      toast.success('Producto actualizado (requiere reconexión del backend)');
-      setEditProduct(null);
-    } else {
-      toast.error('Error al actualizar');
     }
   };
 
@@ -178,7 +161,6 @@ const Home = () => {
                 product={product}
                 isAdmin={isAdmin}
                 onDelete={handleDelete}
-                onEdit={handleEdit}
                 onAddToCart={addToCart}
               />
             ))}
@@ -186,22 +168,6 @@ const Home = () => {
         )}
 
       </section>
-
-      {editProduct && (
-        <div className="modal-overlay" onClick={() => setEditProduct(null)}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <h3>Editar Producto</h3>
-            <form onSubmit={handleSaveEdit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginTop: '1rem' }}>
-              <input className="input-field" defaultValue={editProduct.nombre || editProduct.name} placeholder="Nombre" />
-              <input className="input-field" defaultValue={editProduct.precio || editProduct.price} placeholder="Precio" type="number" />
-              <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
-                <button type="button" className="btn-primary" onClick={() => setEditProduct(null)}>Cancelar</button>
-                <button type="submit" className="btn-accent">Guardar</button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
