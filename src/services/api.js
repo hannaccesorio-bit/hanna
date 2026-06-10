@@ -37,8 +37,18 @@ export const loginAdmin = async (password) => {
 };
 
 export const recoverPassword = async () => {
-  const result = await apiPost({ action: 'recoverPassword' });
-  return result.success;
+  try {
+    await fetch(API_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'recoverPassword' }),
+    });
+    return true;
+  } catch (error) {
+    console.error('Recover password error', error);
+    return false;
+  }
 };
 
 export const createProduct = async (productData) => {
