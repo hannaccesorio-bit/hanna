@@ -17,7 +17,7 @@ const Admin = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [tab, setTab] = useState('products');
 
-  const [product, setProduct] = useState({ name: '', price: '', department: '', category: '', referencia: '' });
+  const [product, setProduct] = useState({ name: '', price: '', department: '', category: '', referencia: '', colores: '', tallas: '' });
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
   const [trashed, setTrashed] = useState(loadTrash);
@@ -100,7 +100,7 @@ const Admin = () => {
     const success = await createProduct({ ...product, imageUrl });
     if (success) {
       toast.success('Producto agregado');
-      setProduct({ name: '', price: '', department: '', category: '', referencia: '' });
+      setProduct({ name: '', price: '', department: '', category: '', referencia: '', colores: '', tallas: '' });
       setImageFile(null); setImagePreview(null);
       loadProducts();
     } else {
@@ -213,6 +213,10 @@ const Admin = () => {
               <datalist id="dep-list">{departments.map(d => <option key={d} value={d} />)}</datalist>
               <input type="text" placeholder="Categoría (Ej. Anillos)" className="input-field" required list="cat-list" value={product.category} onChange={e => setProduct({...product, category: e.target.value})} />
               <datalist id="cat-list">{categories.map(c => <option key={c} value={c} />)}</datalist>
+            </div>
+            <div style={{ display: 'flex', gap: '1rem' }}>
+              <input type="text" placeholder="Colores (Ej. Dorado,Plateado,Negro)" className="input-field" value={product.colores} onChange={e => setProduct({...product, colores: e.target.value})} />
+              <input type="text" placeholder="Tallas de anillos (Ej. 12,14,16,18)" className="input-field" value={product.tallas} onChange={e => setProduct({...product, tallas: e.target.value})} />
             </div>
             <div className="image-upload-area">
               <label className="image-upload-label">

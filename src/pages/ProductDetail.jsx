@@ -17,6 +17,8 @@ export default function ProductDetail() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
+  const [selectedColor, setSelectedColor] = useState('');
+  const [selectedTalla, setSelectedTalla] = useState('');
 
   useEffect(() => {
     const load = async () => {
@@ -43,7 +45,8 @@ export default function ProductDetail() {
     }).slice(0, 4);
   }, [products, product]);
 
-  const cartItem = cart.find(i => i.id === product?.id);
+  const cartKey = product?.id + '|' + selectedColor + '|' + selectedTalla;
+  const cartItem = cart.find(i => i.cartKey === cartKey);
 
   const handleAdd = () => {
     if (!product) return;
@@ -53,7 +56,7 @@ export default function ProductDetail() {
         name: product.nombre || product.name,
         price: product.precio || product.price,
         imageUrl: product.imagenUrl || product.imageUrl,
-      });
+      }, selectedColor, selectedTalla);
     }
     toast.success(`${quantity}x ${product.nombre || product.name} agregado al carrito`);
   };
@@ -97,8 +100,10 @@ export default function ProductDetail() {
   const originalPrice = product.precioOriginal || product.originalPrice;
   const hasDiscount = originalPrice && Number(originalPrice) > Number(price);
   const sku = product.referencia || product.sku || product.id || '';
+  const colorsList = (product.colores || '').split(',').map(s => s.trim()).filter(Boolean);
+  const tallasList = (product.tallas || '').split(',').map(s => s.trim()).filter(Boolean);
 
-  const whatsappMsg = `Hola Hanna Accesorios! Me interesa este producto:%0A*${name}*%0APrecio: $${price}%0ACódigo: ${sku}%0A%0A¿Está disponible?`;
+  const whatsappMsg = `Hola Hanna Accesorios! Me interesa este producto:%0A*${name}*%0APrecio: $${price}%0ACódigo: ${sku}%0A${selectedColor ? 'Color: ' + selectedColor + '%0A' : ''}${selectedTalla ? 'Talla: ' + selectedTalla + '%0A' : ''}%0A¿Está disponible?`;
 
   return (
     <div style={{ maxWidth: 1000, margin: '0 auto' }}>
@@ -145,6 +150,30 @@ export default function ProductDetail() {
           )}
 
           <div className="product-detail-actions">
+            {colorsList.length > 0 && (
+              <div>
+                <p style={{ fontSize: '0.85rem', fontWeight: 600, marginBottom: '0.4rem' }}>Color:</p>
+                <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap' }}>
+                  {colorsList.map(c => (
+                    <button key={c} onClick={() => setSelectedColor(c)} className={selectedColor === c ? 'btn-accent' : 'btn-primary'} style={{ fontSize: '0.8rem', padding: '0.3rem 0.8rem' }}>
+                      {c}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+            {tallasList.length > 0 && (
+              <div>
+                <p style={{ fontSize: '0.85rem', fontWeight: 600, marginBottom: '0.4rem' }}>Talla:</p>
+                <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap' }}>
+                  {tallasList.map(t => (
+                    <button key={t} onClick={() => setSelectedTalla(t)} className={selectedTalla === t ? 'btn-accent' : 'btn-primary'} style={{ fontSize: '0.8rem', padding: '0.3rem 0.8rem' }}>
+                      {t}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
             <div className="quantity-selector">
               <button onClick={() => setQuantity(q => Math.max(1, q - 1))} disabled={quantity <= 1} className="qty-btn">
                 <Minus size={16} />

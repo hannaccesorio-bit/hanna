@@ -23,9 +23,10 @@ const Checkout = () => {
     doc.text(`Teléfono: ${customer.phone}`, 14, 56);
     doc.text(`Dirección: ${customer.address}`, 14, 62);
 
-    const tableColumn = ["Producto", "Cantidad", "Precio Unitario", "Subtotal"];
+    const tableColumn = ["Producto", "Color/Talla", "Cantidad", "Precio Unitario", "Subtotal"];
     const tableRows = cart.map(item => [
       item.name,
+      [item.selectedColor, item.selectedTalla].filter(Boolean).join(' / ') || '-',
       item.quantity.toString(),
       `$${item.price}`,
       `$${item.price * item.quantity}`
@@ -63,7 +64,10 @@ const Checkout = () => {
         toast('No se pudo guardar en la nube, pero tu pedido se enviará por WhatsApp', { icon: '⚠️' });
       }
 
-      const message = `Hola Hanna Accesorios!%0AQuiero realizar un pedido.%0A%0AMi nombre: ${customer.name}%0ATeléfono: ${customer.phone}%0ADirección: ${customer.address}%0A%0APedido:%0A${cart.map(item => `- ${item.quantity}x ${item.name} ($${item.price * item.quantity})`).join('%0A')}%0A%0A*Total: $${totalPrice}*%0A%0A¡Ya tengo la factura generada!`;
+      const message = `Hola Hanna Accesorios!%0AQuiero realizar un pedido.%0A%0AMi nombre: ${customer.name}%0ATeléfono: ${customer.phone}%0ADirección: ${customer.address}%0A%0APedido:%0A${cart.map(item => {
+        const variant = [item.selectedColor, item.selectedTalla].filter(Boolean).join(' - ');
+        return `- ${item.quantity}x ${item.name}${variant ? ' (' + variant + ')' : ''} ($${item.price * item.quantity})`;
+      }).join('%0A')}%0A%0A*Total: $${totalPrice}*%0A%0A¡Ya tengo la factura generada!`;
       window.open(`https://wa.me/584123853699?text=${message}`, '_blank');
 
       clearCart();
@@ -93,25 +97,27 @@ const Checkout = () => {
         <div style={{ flex: '2 1 400px' }}>
           <h3 style={{ marginBottom: '1rem' }}>Tus Productos</h3>
           {cart.map(item => (
-            <div key={item.id} className="premium-card" style={{ display: 'flex', padding: '1rem', marginBottom: '1rem', alignItems: 'center', gap: '1rem' }}>
+            <div key={item.cartKey} className="premium-card" style={{ display: 'flex', padding: '1rem', marginBottom: '1rem', alignItems: 'center', gap: '1rem' }}>
               <img src={item.imageUrl} alt={item.name} style={{ width: '70px', height: '70px', objectFit: 'cover', borderRadius: '8px' }} />
               <div style={{ flex: 1, minWidth: 0 }}>
                 <h4 style={{ fontSize: '0.95rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{item.name}</h4>
                 <p style={{ color: 'var(--color-accent)', fontWeight: 700, marginTop: '0.2rem' }}>${item.price}</p>
+                {item.selectedColor && <p style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)' }}>Color: {item.selectedColor}</p>}
+                {item.selectedTalla && <p style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)' }}>Talla: {item.selectedTalla}</p>}
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
-                <button className="qty-btn" onClick={() => updateQuantity(item.id, item.quantity - 1)} style={{ padding: '0.4rem 0.6rem' }}>
+                <button className="qty-btn" onClick={() => updateQuantity(item.cartKey, item.quantity - 1)} style={{ padding: '0.4rem 0.6rem' }}>
                   <Minus size={14} />
                 </button>
                 <span className="qty-value" style={{ padding: '0.4rem 0.8rem', fontSize: '0.9rem', minWidth: '2rem' }}>{item.quantity}</span>
-                <button className="qty-btn" onClick={() => updateQuantity(item.id, item.quantity + 1)} style={{ padding: '0.4rem 0.6rem' }}>
+                <button className="qty-btn" onClick={() => updateQuantity(item.cartKey, item.quantity + 1)} style={{ padding: '0.4rem 0.6rem' }}>
                   <Plus size={14} />
                 </button>
               </div>
               <div style={{ textAlign: 'right', minWidth: '70px' }}>
                 <p style={{ fontWeight: 'bold', fontSize: '1.1rem' }}>${item.price * item.quantity}</p>
               </div>
-              <button onClick={() => { removeFromCart(item.id); toast('Producto eliminado', { icon: '🗑️' }); }} className="btn-icon" style={{ color: 'var(--color-error)' }}>
+              <button onClick={() => { removeFromCart(item.cartKey); toast('Producto eliminado', { icon: '🗑️' }); }} className="btn-icon" style={{ color: 'var(--color-error)' }}>
                 <Trash2 size={18} />
               </button>
             </div>

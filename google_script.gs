@@ -10,7 +10,7 @@ function setupSheets() {
     if (!ss.getSheetByName(sheetName)) {
       ss.insertSheet(sheetName);
       if (sheetName === 'Productos') {
-        ss.getSheetByName(sheetName).appendRow(['id', 'nombre', 'precio', 'imagenUrl', 'departamento', 'categoria', 'destacado', 'referencia']);
+        ss.getSheetByName(sheetName).appendRow(['id', 'nombre', 'precio', 'imagenUrl', 'departamento', 'categoria', 'destacado', 'referencia', 'colores', 'tallas']);
       } else if (sheetName === 'Pedidos') {
         ss.getSheetByName(sheetName).appendRow(['fecha', 'cliente', 'telefono', 'direccion', 'total', 'detalles']);
       }
@@ -19,6 +19,14 @@ function setupSheets() {
       var headers = sheet.getDataRange().getValues()[0];
       if (headers.indexOf('referencia') === -1) {
         sheet.getRange(1, headers.length + 1).setValue('referencia');
+      }
+      headers = sheet.getDataRange().getValues()[0];
+      if (headers.indexOf('colores') === -1) {
+        sheet.getRange(1, headers.length + 1).setValue('colores');
+      }
+      headers = sheet.getDataRange().getValues()[0];
+      if (headers.indexOf('tallas') === -1) {
+        sheet.getRange(1, headers.length + 1).setValue('tallas');
       }
     }
   }
@@ -95,7 +103,9 @@ function doPost(e) {
         data.product.department,
         data.product.category,
         "true",
-        data.product.referencia || ""
+        data.product.referencia || "",
+        data.product.colores || "",
+        data.product.tallas || ""
       ]);
       
       return ContentService.createTextOutput(JSON.stringify({ success: true }))
@@ -138,6 +148,8 @@ function doPost(e) {
           if (update.category !== undefined) sheet.getRange(row, headers.indexOf('categoria') + 1).setValue(update.category);
           if (update.destacado !== undefined) sheet.getRange(row, headers.indexOf('destacado') + 1).setValue(update.destacado);
           if (update.referencia !== undefined) sheet.getRange(row, headers.indexOf('referencia') + 1).setValue(update.referencia);
+          if (update.colores !== undefined) sheet.getRange(row, headers.indexOf('colores') + 1).setValue(update.colores);
+          if (update.tallas !== undefined) sheet.getRange(row, headers.indexOf('tallas') + 1).setValue(update.tallas);
           
           return ContentService.createTextOutput(JSON.stringify({ success: true }))
             .setMimeType(ContentService.MimeType.JSON);

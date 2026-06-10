@@ -23,29 +23,30 @@ export const CartProvider = ({ children }) => {
     localStorage.setItem(CART_KEY, JSON.stringify(cart));
   }, [cart]);
 
-  const addToCart = (product) => {
+  const addToCart = (product, color = '', talla = '') => {
     setCart((prev) => {
-      const existing = prev.find(item => item.id === product.id);
+      const key = product.id + '|' + color + '|' + talla;
+      const existing = prev.find(item => item.cartKey === key);
       if (existing) {
         return prev.map(item =>
-          item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
+          item.cartKey === key ? { ...item, quantity: item.quantity + 1 } : item
         );
       }
-      return [...prev, { ...product, quantity: 1 }];
+      return [...prev, { ...product, quantity: 1, selectedColor: color, selectedTalla: talla, cartKey: key }];
     });
   };
 
-  const removeFromCart = (productId) => {
-    setCart((prev) => prev.filter(item => item.id !== productId));
+  const removeFromCart = (cartKey) => {
+    setCart((prev) => prev.filter(item => item.cartKey !== cartKey));
   };
 
-  const updateQuantity = (productId, quantity) => {
+  const updateQuantity = (cartKey, quantity) => {
     if (quantity <= 0) {
-      removeFromCart(productId);
+      removeFromCart(cartKey);
       return;
     }
     setCart((prev) => prev.map(item =>
-      item.id === productId ? { ...item, quantity } : item
+      item.cartKey === cartKey ? { ...item, quantity } : item
     ));
   };
 
