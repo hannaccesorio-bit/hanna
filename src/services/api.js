@@ -32,8 +32,15 @@ export const fetchProducts = async () => {
 };
 
 export const loginAdmin = async (password) => {
-  const result = await apiPost({ action: 'login', password });
-  return result.success;
+  try {
+    const response = await fetch(`${API_URL}?action=login&password=${encodeURIComponent(password)}`);
+    const text = await response.text();
+    const result = JSON.parse(text);
+    return result.success;
+  } catch (error) {
+    console.error('Login error', error);
+    return false;
+  }
 };
 
 export const recoverPassword = async () => {
