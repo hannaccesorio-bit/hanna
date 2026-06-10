@@ -56,7 +56,7 @@ export default function ProductDetail() {
         name: product.nombre || product.name,
         price: product.precio || product.price,
         imageUrl: product.imagenUrl || product.imageUrl,
-      }, selectedColor, selectedTalla);
+      }, selectedColor, selectedTalla, colorsList, tallasList);
     }
     toast.success(`${quantity}x ${product.nombre || product.name} agregado al carrito`);
   };

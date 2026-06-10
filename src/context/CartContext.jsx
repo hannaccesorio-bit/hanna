@@ -23,7 +23,7 @@ export const CartProvider = ({ children }) => {
     localStorage.setItem(CART_KEY, JSON.stringify(cart));
   }, [cart]);
 
-  const addToCart = (product, color = '', talla = '') => {
+  const addToCart = (product, color = '', talla = '', availableColors = [], availableTallas = []) => {
     setCart((prev) => {
       const key = product.id + '|' + color + '|' + talla;
       const existing = prev.find(item => item.cartKey === key);
@@ -32,8 +32,14 @@ export const CartProvider = ({ children }) => {
           item.cartKey === key ? { ...item, quantity: item.quantity + 1 } : item
         );
       }
-      return [...prev, { ...product, quantity: 1, selectedColor: color, selectedTalla: talla, cartKey: key }];
+      return [...prev, { ...product, quantity: 1, selectedColor: color, selectedTalla: talla, availableColors, availableTallas, cartKey: key }];
     });
+  };
+
+  const updateCartItem = (cartKey, updates) => {
+    setCart((prev) => prev.map(item =>
+      item.cartKey === cartKey ? { ...item, ...updates } : item
+    ));
   };
 
   const removeFromCart = (cartKey) => {
@@ -56,7 +62,7 @@ export const CartProvider = ({ children }) => {
   const totalPrice = cart.reduce((acc, item) => acc + (item.price * item.quantity), 0);
 
   return (
-    <CartContext.Provider value={{ cart, addToCart, removeFromCart, updateQuantity, clearCart, totalItems, totalPrice }}>
+    <CartContext.Provider value={{ cart, addToCart, removeFromCart, updateQuantity, updateCartItem, clearCart, totalItems, totalPrice }}>
       {children}
     </CartContext.Provider>
   );

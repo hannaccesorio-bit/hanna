@@ -8,7 +8,7 @@ import { Plus, Minus, Trash2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const Checkout = () => {
-  const { cart, totalItems, totalPrice, clearCart, updateQuantity, removeFromCart } = useCart();
+  const { cart, totalItems, totalPrice, clearCart, updateQuantity, removeFromCart, updateCartItem } = useCart();
   const [customer, setCustomer] = useState({ name: '', phone: '', address: '' });
   const [isProcessing, setIsProcessing] = useState(false);
 
@@ -97,29 +97,57 @@ const Checkout = () => {
         <div style={{ flex: '2 1 400px' }}>
           <h3 style={{ marginBottom: '1rem' }}>Tus Productos</h3>
           {cart.map(item => (
-            <div key={item.cartKey} className="premium-card" style={{ display: 'flex', padding: '1rem', marginBottom: '1rem', alignItems: 'center', gap: '1rem' }}>
-              <img src={item.imageUrl} alt={item.name} style={{ width: '70px', height: '70px', objectFit: 'cover', borderRadius: '8px' }} />
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <h4 style={{ fontSize: '0.95rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{item.name}</h4>
-                <p style={{ color: 'var(--color-accent)', fontWeight: 700, marginTop: '0.2rem' }}>${item.price}</p>
-                {item.selectedColor && <p style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)' }}>Color: {item.selectedColor}</p>}
-                {item.selectedTalla && <p style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)' }}>Talla: {item.selectedTalla}</p>}
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
-                <button className="qty-btn" onClick={() => updateQuantity(item.cartKey, item.quantity - 1)} style={{ padding: '0.4rem 0.6rem' }}>
-                  <Minus size={14} />
+            <div key={item.cartKey} className="premium-card" style={{ padding: '1rem', marginBottom: '1rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                <img src={item.imageUrl} alt={item.name} style={{ width: '70px', height: '70px', objectFit: 'cover', borderRadius: '8px' }} />
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <h4 style={{ fontSize: '0.95rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{item.name}</h4>
+                  <p style={{ color: 'var(--color-accent)', fontWeight: 700, marginTop: '0.2rem' }}>${item.price}</p>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+                  <button className="qty-btn" onClick={() => updateQuantity(item.cartKey, item.quantity - 1)} style={{ padding: '0.4rem 0.6rem' }}>
+                    <Minus size={14} />
+                  </button>
+                  <span className="qty-value" style={{ padding: '0.4rem 0.8rem', fontSize: '0.9rem', minWidth: '2rem' }}>{item.quantity}</span>
+                  <button className="qty-btn" onClick={() => updateQuantity(item.cartKey, item.quantity + 1)} style={{ padding: '0.4rem 0.6rem' }}>
+                    <Plus size={14} />
+                  </button>
+                </div>
+                <div style={{ textAlign: 'right', minWidth: '70px' }}>
+                  <p style={{ fontWeight: 'bold', fontSize: '1.1rem' }}>${item.price * item.quantity}</p>
+                </div>
+                <button onClick={() => { removeFromCart(item.cartKey); toast('Producto eliminado', { icon: '🗑️' }); }} className="btn-icon" style={{ color: 'var(--color-error)' }}>
+                  <Trash2 size={18} />
                 </button>
-                <span className="qty-value" style={{ padding: '0.4rem 0.8rem', fontSize: '0.9rem', minWidth: '2rem' }}>{item.quantity}</span>
-                <button className="qty-btn" onClick={() => updateQuantity(item.cartKey, item.quantity + 1)} style={{ padding: '0.4rem 0.6rem' }}>
-                  <Plus size={14} />
-                </button>
               </div>
-              <div style={{ textAlign: 'right', minWidth: '70px' }}>
-                <p style={{ fontWeight: 'bold', fontSize: '1.1rem' }}>${item.price * item.quantity}</p>
-              </div>
-              <button onClick={() => { removeFromCart(item.cartKey); toast('Producto eliminado', { icon: '🗑️' }); }} className="btn-icon" style={{ color: 'var(--color-error)' }}>
-                <Trash2 size={18} />
-              </button>
+              {(item.availableColors?.length > 0 || item.availableTallas?.length > 0) && (
+                <div style={{ display: 'flex', gap: '1rem', marginTop: '0.75rem', paddingTop: '0.75rem', borderTop: '1px solid var(--color-border)', flexWrap: 'wrap' }}>
+                  {item.availableColors?.length > 0 && (
+                    <div>
+                      <p style={{ fontSize: '0.8rem', fontWeight: 600, marginBottom: '0.3rem' }}>Color:</p>
+                      <div style={{ display: 'flex', gap: '0.3rem', flexWrap: 'wrap' }}>
+                        {item.availableColors.map(c => (
+                          <button key={c} onClick={() => updateCartItem(item.cartKey, { selectedColor: c })} className={item.selectedColor === c ? 'btn-accent' : 'btn-primary'} style={{ fontSize: '0.75rem', padding: '0.2rem 0.6rem' }}>
+                            {c}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  {item.availableTallas?.length > 0 && (
+                    <div>
+                      <p style={{ fontSize: '0.8rem', fontWeight: 600, marginBottom: '0.3rem' }}>Talla:</p>
+                      <div style={{ display: 'flex', gap: '0.3rem', flexWrap: 'wrap' }}>
+                        {item.availableTallas.map(t => (
+                          <button key={t} onClick={() => updateCartItem(item.cartKey, { selectedTalla: t })} className={item.selectedTalla === t ? 'btn-accent' : 'btn-primary'} style={{ fontSize: '0.75rem', padding: '0.2rem 0.6rem' }}>
+                            {t}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           ))}
           <p style={{ fontWeight: 'bold', fontSize: '1.3rem', textAlign: 'right', marginTop: '1rem' }}>
