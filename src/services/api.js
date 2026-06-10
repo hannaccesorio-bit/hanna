@@ -5,7 +5,6 @@ const apiPost = async (body) => {
   try {
     const response = await fetch(API_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
     });
     const text = await response.text();
