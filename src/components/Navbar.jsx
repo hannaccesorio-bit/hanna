@@ -7,15 +7,6 @@ import './Navbar.css';
 
 const menuItems = [
   { label: 'Inicio', path: '/' },
-  {
-    label: 'Relojería',
-    path: '/#colecciones',
-    submenu: [
-      { label: 'Yess', path: '/?cat=Yess' },
-      { label: 'Clásicos', path: '/?cat=Clásicos' },
-      { label: 'Deportivos', path: '/?cat=Deportivos' },
-    ],
-  },
 ];
 
 const Navbar = ({ onSearch }) => {
