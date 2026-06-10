@@ -98,14 +98,14 @@ export default function ProductDetail() {
   const hasDiscount = originalPrice && Number(originalPrice) > Number(price);
   const sku = product.sku || product.id || '';
 
-  const whatsappMsg = `Hola Hannaccesorio! Me interesa este producto:%0A*${name}*%0APrecio: $${price}%0ACódigo: ${sku}%0A%0A¿Está disponible?`;
+  const whatsappMsg = `Hola Hanna Accesorios! Me interesa este producto:%0A*${name}*%0APrecio: $${price}%0ACódigo: ${sku}%0A%0A¿Está disponible?`;
 
   return (
     <div style={{ maxWidth: 1000, margin: '0 auto' }}>
       <Helmet>
-        <title>{name} - Hannaccesorio</title>
+        <title>{name} - Hanna Accesorios</title>
         <meta name="description" content={`${name} - ${price} en Hannaccesorio. ${description}`} />
-        <meta property="og:title" content={`${name} - Hannaccesorio`} />
+        <meta property="og:title" content={`${name} - Hanna Accesorios`} />
         <meta property="og:description" content={description || `${name} - Precio: $${price}`} />
         {imageUrl && <meta property="og:image" content={imageUrl} />}
       </Helmet>

@@ -18,12 +18,21 @@
 }
 
 .nav-logo {
-  font-size: 1.5rem;
+  font-size: 1.3rem;
   font-weight: 700;
   color: var(--color-primary);
   text-decoration: none;
-  letter-spacing: 2px;
+  letter-spacing: 1.5px;
   transition: color 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.logo-icon {
+  color: var(--color-accent);
+  font-size: 1.6rem;
+  line-height: 1;
 }
 
 .nav-links {

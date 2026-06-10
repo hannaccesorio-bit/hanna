@@ -22,7 +22,9 @@ const Navbar = ({ onSearch }) => {
   return (
     <nav className="premium-navbar">
       <div className="nav-container">
-        <Link to="/" className="nav-logo">HANNACCESORIO</Link>
+        <Link to="/" className="nav-logo">
+  <span className="logo-icon">◆</span> HANNA ACCESORIOS
+</Link>
 
         <div className="nav-links">
           <Link to="/" className="nav-link">Inicio</Link>

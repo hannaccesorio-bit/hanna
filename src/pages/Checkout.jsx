@@ -14,7 +14,7 @@ const Checkout = () => {
   const generatePDF = () => {
     const doc = new jsPDF();
     doc.setFontSize(20);
-    doc.text('HANNACCESORIO', 14, 22);
+    doc.text('HANNA ACCESORIOS', 14, 22);
     doc.setFontSize(12);
     doc.text('TICKET DE COMPRA', 14, 30);
     doc.text(`Fecha: ${new Date().toLocaleDateString()}`, 14, 38);
@@ -62,7 +62,7 @@ const Checkout = () => {
         toast('No se pudo guardar en la nube, pero tu pedido se enviará por WhatsApp', { icon: '⚠️' });
       }
 
-      const message = `Hola Hannaccesorio!%0AQuiero realizar un pedido.%0A%0AMi nombre: ${customer.name}%0ATeléfono: ${customer.phone}%0ADirección: ${customer.address}%0A%0APedido:%0A${cart.map(item => `- ${item.quantity}x ${item.name} ($${item.price * item.quantity})`).join('%0A')}%0A%0A*Total: $${totalPrice}*%0A%0A¡Ya tengo la factura generada!`;
+      const message = `Hola Hanna Accesorios!%0AQuiero realizar un pedido.%0A%0AMi nombre: ${customer.name}%0ATeléfono: ${customer.phone}%0ADirección: ${customer.address}%0A%0APedido:%0A${cart.map(item => `- ${item.quantity}x ${item.name} ($${item.price * item.quantity})`).join('%0A')}%0A%0A*Total: $${totalPrice}*%0A%0A¡Ya tengo la factura generada!`;
       window.open(`https://wa.me/584123853699?text=${message}`, '_blank');
 
       clearCart();
@@ -77,7 +77,7 @@ const Checkout = () => {
   if (cart.length === 0) {
     return (
       <div style={{ textAlign: 'center', padding: '4rem' }}>
-        <Helmet><title>Carrito - Hannaccesorio</title></Helmet>
+        <Helmet><title>Carrito - Hanna Accesorios</title></Helmet>
         <h2>Tu carrito está vacío</h2>
         <p style={{ color: 'var(--color-text-muted)', marginTop: '1rem' }}>Agrega productos desde el catálogo para comenzar.</p>
       </div>
@@ -86,7 +86,7 @@ const Checkout = () => {
 
   return (
     <div>
-      <Helmet><title>Finalizar Compra - Hannaccesorio</title></Helmet>
+      <Helmet><title>Finalizar Compra - Hanna Accesorios</title></Helmet>
       <h2 style={{ marginBottom: '2rem' }}>Finalizar Compra ({totalItems} productos)</h2>
       <div style={{ display: 'flex', gap: '2rem', flexWrap: 'wrap' }}>
         <div style={{ flex: '2 1 400px' }}>

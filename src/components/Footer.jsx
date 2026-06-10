@@ -45,7 +45,7 @@ const Footer = () => {
 
       </div>
       <div className="footer-bottom">
-        <p>&copy; {new Date().getFullYear()} Hannaccesorio. Todos los derechos reservados.</p>
+        <p>&copy; {new Date().getFullYear()} Hanna Accesorios. Todos los derechos reservados.</p>
       </div>
     </footer>
   );

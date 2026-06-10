@@ -157,11 +157,12 @@ body {
 .hero-section {
   position: relative;
   width: 100%;
-  height: 60vh;
+  aspect-ratio: 19 / 9;
   min-height: 400px;
-  background-image: url('https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?auto=format&fit=crop&q=80&w=2000');
+  max-height: 80vh;
+  background-image: url('https://images.unsplash.com/photo-1603569283847-5f1c6ef6e19b?auto=format&fit=crop&q=80&w=2000');
   background-size: cover;
-  background-position: center;
+  background-position: center 40%;
   background-attachment: fixed;
   display: flex;
   align-items: center;
@@ -495,6 +496,55 @@ body {
 .btn-back:hover {
   border-color: var(--color-accent);
   color: var(--color-accent);
+}
+
+/* Image upload & preview */
+.image-upload-area {
+  border: 2px dashed var(--color-border);
+  padding: 1.5rem;
+  text-align: center;
+  border-radius: var(--radius-md);
+  transition: border-color 0.3s;
+}
+
+.image-upload-area:hover {
+  border-color: var(--color-accent);
+}
+
+.image-upload-label {
+  cursor: pointer;
+  color: var(--color-primary);
+  display: block;
+}
+
+.image-preview-container {
+  position: relative;
+  margin-top: 1rem;
+  display: inline-block;
+}
+
+.image-preview {
+  max-width: 100%;
+  max-height: 250px;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+}
+
+.image-preview-remove {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--color-error);
+  color: #fff;
+  border: 2px solid var(--color-surface);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
 }
 
 @media (max-width: 768px) {

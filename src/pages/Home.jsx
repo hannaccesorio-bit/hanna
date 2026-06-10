@@ -66,7 +66,11 @@ const Home = () => {
         setProducts(prev => prev.filter(p => p.id !== product.id));
         toast.success('Producto eliminado');
       } else {
-        toast.error('Error al eliminar el producto');
+        const trash = JSON.parse(localStorage.getItem('hanna_trashed_products') || '[]');
+        trash.push(product);
+        localStorage.setItem('hanna_trashed_products', JSON.stringify(trash));
+        setProducts(prev => prev.filter(p => p.id !== product.id));
+        toast('Producto movido a la papelera (local)', { icon: '🗑️' });
       }
     }
   };
@@ -102,7 +106,7 @@ const Home = () => {
   return (
     <div>
       <Helmet>
-        <title>Hannaccesorio - Catálogo Premium</title>
+        <title>Hanna Accesorios - Catálogo Premium</title>
         <meta name="description" content="Descubre los accesorios más exclusivos y premium diseñados para deslumbrar." />
       </Helmet>
 

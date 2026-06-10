@@ -16,8 +16,8 @@ const PhotoCard = ({ product, isAdmin = false, onDelete, onEdit, onAddToCart }) 
       ? product.disponible
       : true;
 
-  const whatsappMsg = `Hola Hannaccesorio! Me interesa este producto:%0A*${name}*%0APrecio: $${price}%0A%0A¿Está disponible?`;
-  const shareMsg = `Mira este producto de Hannaccesorio:%0A${name} - $${price}`;
+  const whatsappMsg = `Hola Hanna Accesorios! Me interesa este producto:%0A*${name}*%0APrecio: $${price}%0A%0A¿Está disponible?`;
+  const shareMsg = `Mira este producto de Hanna Accesorios:%0A${name} - $${price}`;
   const productLink = `/producto/${product.id}`;
 
   return (
