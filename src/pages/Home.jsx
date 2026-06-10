@@ -4,9 +4,8 @@ import { useSearchParams } from 'react-router-dom';
 import PhotoCard from '../components/PhotoCard';
 import AlertBanner from '../components/AlertBanner';
 import SkeletonCard from '../components/SkeletonCard';
-import { fetchProducts, deleteProduct as deleteProductApi } from '../services/api';
+import { fetchProducts } from '../services/api';
 import { useCart } from '../context/CartContext';
-import toast from 'react-hot-toast';
 
 const Home = () => {
   const { addToCart } = useCart();
@@ -15,7 +14,6 @@ const Home = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '');
   const [categoryFilter, setCategoryFilter] = useState(searchParams.get('cat') || '');
-  const [isAdmin] = useState(() => sessionStorage.getItem('admin_authenticated') === 'true');
   const [openDept, setOpenDept] = useState(null);
 
   useEffect(() => {
@@ -54,22 +52,6 @@ const Home = () => {
       return matchesSearch && matchesCategory;
     });
   }, [products, searchQuery, categoryFilter]);
-
-  const handleDelete = async (product) => {
-    if (window.confirm(`¿Eliminar "${product.nombre || product.name}"?`)) {
-      const ok = await deleteProductApi(product.id);
-      if (ok) {
-        setProducts(prev => prev.filter(p => p.id !== product.id));
-        toast.success('Producto eliminado');
-      } else {
-        const trash = JSON.parse(localStorage.getItem('hanna_trashed_products') || '[]');
-        trash.push(product);
-        localStorage.setItem('hanna_trashed_products', JSON.stringify(trash));
-        setProducts(prev => prev.filter(p => p.id !== product.id));
-        toast('Producto movido a la papelera (local)', { icon: '🗑️' });
-      }
-    }
-  };
 
   const handleSearchChange = (q) => {
     setSearchQuery(q);
@@ -159,8 +141,6 @@ const Home = () => {
               <PhotoCard
                 key={product.id || product.nombre}
                 product={product}
-                isAdmin={isAdmin}
-                onDelete={handleDelete}
                 onAddToCart={addToCart}
               />
             ))}
