@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { loginAdmin, createProduct, uploadImageToImgBB, recoverPassword, fetchProducts } from '../services/api';
 import AdminOrders from './AdminOrders';
-import { Trash2, RotateCcw, Search, X } from 'lucide-react';
+import { Trash2, RotateCcw, Search, X, Check } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const TRASH_KEY = 'hanna_trashed_products';
@@ -28,6 +28,23 @@ const Admin = () => {
   const [departments, setDepartments] = useState([]);
   const [newCategory, setNewCategory] = useState('');
   const [newDepartment, setNewDepartment] = useState('');
+
+  const [colorsMaster, setColorsMaster] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('hanna_colors') || '[]'); } catch { return []; }
+  });
+  const [tallasMaster, setTallasMaster] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('hanna_tallas') || '[]'); } catch { return []; }
+  });
+  const [newColor, setNewColor] = useState('');
+  const [newTalla, setNewTalla] = useState('');
+
+  useEffect(() => {
+    localStorage.setItem('hanna_colors', JSON.stringify(colorsMaster));
+  }, [colorsMaster]);
+
+  useEffect(() => {
+    localStorage.setItem('hanna_tallas', JSON.stringify(tallasMaster));
+  }, [tallasMaster]);
 
   useEffect(() => {
     localStorage.setItem(TRASH_KEY, JSON.stringify(trashed));
@@ -159,6 +176,44 @@ const Admin = () => {
     toast.success(`Departamento "${newDepartment.trim()}" agregado`);
   };
 
+  const handleAddColor = () => {
+    if (!newColor.trim()) return;
+    setColorsMaster(prev => [...prev, newColor.trim()]);
+    setNewColor('');
+    toast.success(`Color "${newColor.trim()}" agregado`);
+  };
+
+  const handleDeleteColor = (c) => {
+    setColorsMaster(prev => prev.filter(x => x !== c));
+    toast.success(`Color "${c}" eliminado`);
+  };
+
+  const handleAddTalla = () => {
+    if (!newTalla.trim()) return;
+    setTallasMaster(prev => [...prev, newTalla.trim()]);
+    setNewTalla('');
+    toast.success(`Talla "${newTalla.trim()}" agregada`);
+  };
+
+  const handleDeleteTalla = (t) => {
+    setTallasMaster(prev => prev.filter(x => x !== t));
+    toast.success(`Talla "${t}" eliminada`);
+  };
+
+  const toggleColor = (c) => {
+    const current = product.colores ? product.colores.split(',').map(s => s.trim()).filter(Boolean) : [];
+    const idx = current.indexOf(c);
+    const next = idx >= 0 ? current.filter(x => x !== c) : [...current, c];
+    setProduct({...product, colores: next.join(',')});
+  };
+
+  const toggleTalla = (t) => {
+    const current = product.tallas ? product.tallas.split(',').map(s => s.trim()).filter(Boolean) : [];
+    const idx = current.indexOf(t);
+    const next = idx >= 0 ? current.filter(x => x !== t) : [...current, t];
+    setProduct({...product, tallas: next.join(',')});
+  };
+
   const filtered = allProducts.filter(p => {
     const name = (p.nombre || p.name || '').toLowerCase();
     return !searchQuery || name.includes(searchQuery.toLowerCase());
@@ -195,6 +250,7 @@ const Admin = () => {
         <button onClick={() => setTab('products')} className={tab === 'products' ? 'btn-accent' : 'btn-primary'} style={{ fontSize: '0.9rem' }}>Añadir Producto</button>
         <button onClick={() => { setTab('manage'); loadProducts(); }} className={tab === 'manage' ? 'btn-accent' : 'btn-primary'} style={{ fontSize: '0.9rem' }}>Gestionar Productos</button>
         <button onClick={() => setTab('categories')} className={tab === 'categories' ? 'btn-accent' : 'btn-primary'} style={{ fontSize: '0.9rem' }}>Categorías</button>
+        <button onClick={() => setTab('variants')} className={tab === 'variants' ? 'btn-accent' : 'btn-primary'} style={{ fontSize: '0.9rem' }}>Colores y Tallas</button>
         <button onClick={() => setTab('orders')} className={tab === 'orders' ? 'btn-accent' : 'btn-primary'} style={{ fontSize: '0.9rem' }}>Pedidos</button>
         <button onClick={() => setTab('trash')} className={tab === 'trash' ? 'btn-accent' : 'btn-primary'} style={{ fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
           <Trash2 size={16} /> Papelera {trashed.length > 0 && `(${trashed.length})`}
@@ -215,8 +271,28 @@ const Admin = () => {
               <datalist id="cat-list">{categories.map(c => <option key={c} value={c} />)}</datalist>
             </div>
             <div style={{ display: 'flex', gap: '1rem' }}>
-              <input type="text" placeholder="Colores (Ej. Dorado,Plateado,Negro)" className="input-field" value={product.colores} onChange={e => setProduct({...product, colores: e.target.value})} />
-              <input type="text" placeholder="Tallas de anillos (Ej. 12,14,16,18)" className="input-field" value={product.tallas} onChange={e => setProduct({...product, tallas: e.target.value})} />
+              <div style={{ flex: 1 }}>
+                <p style={{ fontSize: '0.85rem', fontWeight: 600, marginBottom: '0.3rem' }}>Colores {product.colores && <span style={{ color: 'var(--color-accent)', fontSize: '0.8rem' }}>({product.colores})</span>}</p>
+                <div style={{ display: 'flex', gap: '0.3rem', flexWrap: 'wrap' }}>
+                  {colorsMaster.length === 0 && <span style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)' }}>Sin colores definidos</span>}
+                  {colorsMaster.map(c => (
+                    <button key={c} type="button" onClick={() => toggleColor(c)} style={{ fontSize: '0.75rem', padding: '0.2rem 0.6rem', border: product.colores?.includes(c) ? '2px solid var(--color-accent)' : '1px solid var(--color-border)', borderRadius: '6px', background: product.colores?.includes(c) ? 'var(--color-accent)' : 'var(--color-surface)', color: product.colores?.includes(c) ? '#111' : 'var(--color-text)', cursor: 'pointer' }}>
+                      {c} {product.colores?.includes(c) && ' ✓'}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div style={{ flex: 1 }}>
+                <p style={{ fontSize: '0.85rem', fontWeight: 600, marginBottom: '0.3rem' }}>Tallas {product.tallas && <span style={{ color: 'var(--color-accent)', fontSize: '0.8rem' }}>({product.tallas})</span>}</p>
+                <div style={{ display: 'flex', gap: '0.3rem', flexWrap: 'wrap' }}>
+                  {tallasMaster.length === 0 && <span style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)' }}>Sin tallas definidas</span>}
+                  {tallasMaster.map(t => (
+                    <button key={t} type="button" onClick={() => toggleTalla(t)} style={{ fontSize: '0.75rem', padding: '0.2rem 0.6rem', border: product.tallas?.includes(t) ? '2px solid var(--color-accent)' : '1px solid var(--color-border)', borderRadius: '6px', background: product.tallas?.includes(t) ? 'var(--color-accent)' : 'var(--color-surface)', color: product.tallas?.includes(t) ? '#111' : 'var(--color-text)', cursor: 'pointer' }}>
+                      {t} {product.tallas?.includes(t) && ' ✓'}
+                    </button>
+                  ))}
+                </div>
+              </div>
             </div>
             <div className="image-upload-area">
               <label className="image-upload-label">
@@ -301,6 +377,49 @@ const Admin = () => {
                   <div key={c} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.4rem 0.75rem', borderRadius: 'var(--radius-md)', background: 'var(--color-bg)' }}>
                     <span>{c}</span>
                     <button onClick={() => handleDeleteCategory(c)} className="btn-icon" style={{ color: 'var(--color-error)', width: 24, height: 24 }}><X size={14} /></button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {tab === 'variants' && (
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
+          <div className="premium-card" style={{ padding: '2rem' }}>
+            <h3 style={{ marginBottom: '1rem' }}>Colores</h3>
+            <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem' }}>
+              <input type="text" placeholder="Nuevo color..." className="input-field" value={newColor} onChange={e => setNewColor(e.target.value)} onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), handleAddColor())} />
+              <button onClick={handleAddColor} className="btn-accent" style={{ fontSize: '0.85rem', whiteSpace: 'nowrap' }}>Agregar</button>
+            </div>
+            {colorsMaster.length === 0 ? (
+              <p style={{ color: 'var(--color-text-muted)', fontSize: '0.9rem' }}>Sin colores definidos</p>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                {colorsMaster.map(c => (
+                  <div key={c} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.4rem 0.75rem', borderRadius: 'var(--radius-md)', background: 'var(--color-bg)' }}>
+                    <span>{c}</span>
+                    <button onClick={() => handleDeleteColor(c)} className="btn-icon" style={{ color: 'var(--color-error)', width: 24, height: 24 }}><X size={14} /></button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+          <div className="premium-card" style={{ padding: '2rem' }}>
+            <h3 style={{ marginBottom: '1rem' }}>Tallas de Anillos</h3>
+            <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem' }}>
+              <input type="text" placeholder="Nueva talla..." className="input-field" value={newTalla} onChange={e => setNewTalla(e.target.value)} onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), handleAddTalla())} />
+              <button onClick={handleAddTalla} className="btn-accent" style={{ fontSize: '0.85rem', whiteSpace: 'nowrap' }}>Agregar</button>
+            </div>
+            {tallasMaster.length === 0 ? (
+              <p style={{ color: 'var(--color-text-muted)', fontSize: '0.9rem' }}>Sin tallas definidas</p>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                {tallasMaster.map(t => (
+                  <div key={t} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.4rem 0.75rem', borderRadius: 'var(--radius-md)', background: 'var(--color-bg)' }}>
+                    <span>{t}</span>
+                    <button onClick={() => handleDeleteTalla(t)} className="btn-icon" style={{ color: 'var(--color-error)', width: 24, height: 24 }}><X size={14} /></button>
                   </div>
                 ))}
               </div>
