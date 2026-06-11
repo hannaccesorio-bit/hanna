@@ -23,16 +23,16 @@ export const CartProvider = ({ children }) => {
     localStorage.setItem(CART_KEY, JSON.stringify(cart));
   }, [cart]);
 
-  const addToCart = (product, color = '', talla = '', availableColors = [], availableTallas = []) => {
+  const addToCart = (product, color = '', talla = '', availableColors = [], availableTallas = [], quantity = 1) => {
     setCart((prev) => {
       const key = product.id + '|' + color + '|' + talla;
       const existing = prev.find(item => item.cartKey === key);
       if (existing) {
         return prev.map(item =>
-          item.cartKey === key ? { ...item, quantity: item.quantity + 1 } : item
+          item.cartKey === key ? { ...item, quantity: item.quantity + quantity } : item
         );
       }
-      return [...prev, { ...product, quantity: 1, selectedColor: color, selectedTalla: talla, availableColors, availableTallas, cartKey: key }];
+      return [...prev, { ...product, quantity, selectedColor: color, selectedTalla: talla, availableColors, availableTallas, cartKey: key }];
     });
   };
 
