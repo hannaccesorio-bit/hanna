@@ -33,7 +33,7 @@ const PhotoCard = ({ product, isAdmin = false, onDelete, onAddToCart }) => {
       setModalQty(1);
       setShowModal(true);
     } else {
-      onAddToCart({ id: product.id, name, price, imageUrl }, '', '', [], []);
+      onAddToCart({ id: product.id, name, price, imageUrl, referencia: product.referencia }, '', '', [], []);
       toast.success('Agregado al carrito');
     }
   };
