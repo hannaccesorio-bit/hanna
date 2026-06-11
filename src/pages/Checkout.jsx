@@ -123,27 +123,21 @@ const Checkout = () => {
               {(item.availableColors?.length > 0 || item.availableTallas?.length > 0) && (
                 <div style={{ display: 'flex', gap: '1rem', marginTop: '0.75rem', paddingTop: '0.75rem', borderTop: '1px solid var(--color-border)', flexWrap: 'wrap' }}>
                   {item.availableColors?.length > 0 && (
-                    <div>
+                    <div style={{ flex: '1 1 140px' }}>
                       <p style={{ fontSize: '0.8rem', fontWeight: 600, marginBottom: '0.3rem' }}>Color:</p>
-                      <div style={{ display: 'flex', gap: '0.3rem', flexWrap: 'wrap' }}>
-                        {item.availableColors.map(c => (
-                          <button key={c} onClick={() => updateCartItem(item.cartKey, { selectedColor: c })} className={item.selectedColor === c ? 'btn-accent' : 'btn-primary'} style={{ fontSize: '0.75rem', padding: '0.2rem 0.6rem' }}>
-                            {c}
-                          </button>
-                        ))}
-                      </div>
+                      <select className="input-field" value={item.selectedColor} onChange={e => updateCartItem(item.cartKey, { selectedColor: e.target.value })} style={{ fontSize: '0.85rem', width: '100%' }}>
+                        <option value="">Seleccionar</option>
+                        {item.availableColors.map(c => <option key={c} value={c}>{c}</option>)}
+                      </select>
                     </div>
                   )}
                   {item.availableTallas?.length > 0 && (
-                    <div>
+                    <div style={{ flex: '1 1 100px' }}>
                       <p style={{ fontSize: '0.8rem', fontWeight: 600, marginBottom: '0.3rem' }}>Talla:</p>
-                      <div style={{ display: 'flex', gap: '0.3rem', flexWrap: 'wrap' }}>
-                        {item.availableTallas.map(t => (
-                          <button key={t} onClick={() => updateCartItem(item.cartKey, { selectedTalla: t })} className={item.selectedTalla === t ? 'btn-accent' : 'btn-primary'} style={{ fontSize: '0.75rem', padding: '0.2rem 0.6rem' }}>
-                            {t}
-                          </button>
-                        ))}
-                      </div>
+                      <select className="input-field" value={item.selectedTalla} onChange={e => updateCartItem(item.cartKey, { selectedTalla: e.target.value })} style={{ fontSize: '0.85rem', width: '100%' }}>
+                        <option value="">Seleccionar</option>
+                        {item.availableTallas.map(t => <option key={t} value={t}>{t}</option>)}
+                      </select>
                     </div>
                   )}
                 </div>
