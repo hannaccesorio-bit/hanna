@@ -52,6 +52,17 @@ const Checkout = () => {
     doc.setFontSize(14);
     doc.text(`Total a Pagar: $${totalPrice}`, 14, finalY + 15);
 
+    doc.setFontSize(9);
+    doc.setTextColor(100);
+    const footerY = finalY + 30;
+    doc.text('________________________________________________________________________________', 14, footerY);
+    doc.text('HANNA ACCESORIOS', 14, footerY + 7);
+    doc.text('Tel\u00e9fono: +58 412-3853699', 14, footerY + 13);
+    doc.text('Email: hannaccesorio@gmail.com', 14, footerY + 19);
+    doc.text('Direcci\u00f3n: Avenida Urdaneta, Caracas, Venezuela', 14, footerY + 25);
+    doc.text('\u00a1Gracias por tu compra!', 14, footerY + 33);
+    doc.setTextColor(0);
+
     if (includeRef) {
       return doc.output('datauristring');
     }
@@ -86,12 +97,12 @@ const Checkout = () => {
       }
 
       const itemsStr = cart.map(item => {
-        const ref = item.referencia ? ` (Ref: ${item.referencia})` : '';
+        const ref = item.referencia ? `Ref: ${item.referencia}` : 'Ref: N/A';
         const variant = [item.selectedColor, item.selectedTalla].filter(Boolean).join(' - ');
-        return `- ${item.quantity}x ${item.name}${ref}${variant ? ' (' + variant + ')' : ''} ($${item.price * item.quantity})`;
+        return `- ${item.quantity}x ${item.name} (${ref}${variant ? ', ' + variant : ''}) $${item.price * item.quantity}`;
       }).join('%0A');
 
-      const message = `Hola Hanna Accesorios!%0AQuiero realizar un pedido.%0A%0A*DATOS DEL CLIENTE*%0ANombre: ${customer.name}%0ATeléfono: ${customer.phone}%0ACédula/RIF: ${customer.cedula}%0ADirección: ${customer.address}%0ACiudad: ${customer.ciudad}%0APaís: ${customer.pais}%0AEmpresa de Envío: ${customer.empresaEnvio}%0A%0A*PEDIDO*%0A${itemsStr}%0A%0A*Total: $${totalPrice}*%0A%0A¡Ya tengo la factura generada!`;
+      const message = `Hola Hanna Accesorios!%0AQuiero realizar un pedido.%0A%0A*DATOS DEL CLIENTE*%0ANombre: ${customer.name}%0ATel\u00e9fono: ${customer.phone}%0AC\u00e9dula/RIF: ${customer.cedula}%0ADirecci\u00f3n: ${customer.address}%0ACiudad: ${customer.ciudad}%0APa\u00eds: ${customer.pais}%0AEmpresa de Env\u00edo: ${customer.empresaEnvio}%0A%0A*PEDIDO*%0A${itemsStr}%0A%0A*Total: $${totalPrice}*%0A%0A\u00a1Gracias por tu compra!%0AHanna Accesorios | +58 412-3853699 | Avenida Urdaneta, Caracas, Venezuela`;
       window.open(`https://wa.me/584123853699?text=${message}`, '_blank');
 
       clearCart();
