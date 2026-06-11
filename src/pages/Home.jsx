@@ -148,6 +148,18 @@ const Home = () => {
         )}
 
       </section>
+
+      <section style={{ padding: '2rem 0', textAlign: 'center' }}>
+        <div className="premium-card" style={{ display: 'inline-flex', alignItems: 'center', gap: '2rem', padding: '1.5rem 2.5rem', margin: '0 auto' }}>
+          <div>
+            <p style={{ fontSize: '0.9rem', color: 'var(--color-text-muted)' }}>Síguenos en</p>
+            <a href="https://www.instagram.com/hannaccesorio/" target="_blank" rel="noopener noreferrer" style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--color-accent)', textDecoration: 'none' }}>
+              @hannaccesorio
+            </a>
+          </div>
+          <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=https://www.instagram.com/hannaccesorio/" alt="QR Instagram" style={{ width: 80, height: 80, borderRadius: '8px' }} />
+        </div>
+      </section>
     </div>
   );
 };
