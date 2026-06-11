@@ -50,14 +50,13 @@ export default function ProductDetail() {
 
   const handleAdd = () => {
     if (!product) return;
-    for (let i = 0; i < quantity; i++) {
-      addToCart({
-        id: product.id,
-        name: product.nombre || product.name,
-        price: product.precio || product.price,
-        imageUrl: product.imagenUrl || product.imageUrl,
-      }, selectedColor, selectedTalla, colorsList, tallasList);
-    }
+    addToCart({
+      id: product.id,
+      name: product.nombre || product.name,
+      price: product.precio || product.price,
+      imageUrl: product.imagenUrl || product.imageUrl,
+      referencia: product.referencia,
+    }, selectedColor, selectedTalla, colorsList, tallasList, quantity);
     toast.success(`${quantity}x ${product.nombre || product.name} agregado al carrito`);
   };
 
