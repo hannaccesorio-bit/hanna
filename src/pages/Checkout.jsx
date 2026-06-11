@@ -33,7 +33,7 @@ const Checkout = () => {
     const tableColumn = ["Producto", "Ref/SKU", "ID", "Color/Talla", "Cantidad", "Precio", "Subtotal"];
     const tableRows = cart.map(item => [
       item.name,
-      item.referencia || '-',
+      item.referencia || item.id || '-',
       item.id || '-',
       [item.selectedColor, item.selectedTalla].filter(Boolean).join(' / ') || '-',
       item.quantity.toString(),
