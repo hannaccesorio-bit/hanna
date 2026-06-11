@@ -103,7 +103,7 @@ export default function ProductDetail() {
   const colorsList = String(product.colores || '').split(',').map(s => s.trim()).filter(Boolean);
   const tallasList = String(product.tallas || '').split(',').map(s => s.trim()).filter(Boolean);
 
-  const whatsappMsg = `Hola Hanna Accesorios! Me interesa este producto:%0A*${name}*%0APrecio: $${price}%0ACódigo: ${sku}%0A${selectedColor ? 'Color: ' + selectedColor + '%0A' : ''}${selectedTalla ? 'Talla: ' + selectedTalla + '%0A' : ''}%0A¿Está disponible?`;
+  const whatsappMsg = `Hola Hanna Accesorios! Me interesa este producto:%0A*${name}*%0APrecio: $${price}%0ARef: ${sku}%0AID: ${product.id}%0A${selectedColor ? 'Color: ' + selectedColor + '%0A' : ''}${selectedTalla ? 'Talla: ' + selectedTalla + '%0A' : ''}%0A¿Está disponible?`;
 
   return (
     <div style={{ maxWidth: 1000, margin: '0 auto' }}>

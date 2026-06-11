@@ -30,10 +30,11 @@ const Checkout = () => {
     doc.text(`País: ${customer.pais}`, 14, 84);
     doc.text(`Empresa de Envío: ${customer.empresaEnvio}`, 14, 90);
 
-    const tableColumn = ["Producto", "Ref", "Color/Talla", "Cantidad", "Precio", "Subtotal"];
+    const tableColumn = ["Producto", "Ref/SKU", "ID", "Color/Talla", "Cantidad", "Precio", "Subtotal"];
     const tableRows = cart.map(item => [
       item.name,
-      item.referencia || item.sku || item.id || '-',
+      item.referencia || '-',
+      item.id || '-',
       [item.selectedColor, item.selectedTalla].filter(Boolean).join(' / ') || '-',
       item.quantity.toString(),
       `$${item.price}`,
@@ -98,8 +99,9 @@ const Checkout = () => {
 
       const itemsStr = cart.map(item => {
         const ref = item.referencia ? `Ref: ${item.referencia}` : 'Ref: N/A';
+        const idStr = item.id ? `ID: ${item.id}` : '';
         const variant = [item.selectedColor, item.selectedTalla].filter(Boolean).join(' - ');
-        return `- ${item.quantity}x ${item.name} (${ref}${variant ? ', ' + variant : ''}) $${item.price * item.quantity}`;
+        return `- ${item.quantity}x ${item.name} (${ref}${idStr ? ', ' + idStr : ''}${variant ? ', ' + variant : ''}) $${item.price * item.quantity}`;
       }).join('%0A');
 
       const message = `Hola Hanna Accesorios!%0AQuiero realizar un pedido.%0A%0A*DATOS DEL CLIENTE*%0ANombre: ${customer.name}%0ATel\u00e9fono: ${customer.phone}%0AC\u00e9dula/RIF: ${customer.cedula}%0ADirecci\u00f3n: ${customer.address}%0ACiudad: ${customer.ciudad}%0APa\u00eds: ${customer.pais}%0AEmpresa de Env\u00edo: ${customer.empresaEnvio}%0A%0A*PEDIDO*%0A${itemsStr}%0A%0A*Total: $${totalPrice}*%0A%0A\u00a1Gracias por tu compra!%0AHanna Accesorios | +58 412-3853699 | Avenida Urdaneta, Caracas, Venezuela`;
