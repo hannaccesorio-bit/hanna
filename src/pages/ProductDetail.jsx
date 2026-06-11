@@ -107,7 +107,7 @@ export default function ProductDetail() {
   return (
     <div style={{ maxWidth: 1000, margin: '0 auto' }}>
       <Helmet>
-        <title>{name} - Hanna Accesorios</title>
+        <title>{String(name)} - Hanna Accesorios</title>
         <meta name="description" content={`${name} - ${price} en Hannaccesorio. ${description}`} />
         <meta property="og:title" content={`${name} - Hanna Accesorios`} />
         <meta property="og:description" content={description || `${name} - Precio: $${price}`} />
