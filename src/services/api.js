@@ -81,7 +81,6 @@ export const sendOrder = async (orderData) => {
     await fetch(API_URL, {
       method: 'POST',
       mode: 'no-cors',
-      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ action: 'createOrder', ...orderData }),
     });
     return true;

@@ -12,7 +12,7 @@ function setupSheets() {
       if (sheetName === 'Productos') {
         ss.getSheetByName(sheetName).appendRow(['id', 'nombre', 'precio', 'imagenUrl', 'departamento', 'categoria', 'destacado', 'referencia', 'colores', 'tallas']);
       } else if (sheetName === 'Pedidos') {
-        ss.getSheetByName(sheetName).appendRow(['fecha', 'cliente', 'telefono', 'direccion', 'total', 'detalles']);
+        ss.getSheetByName(sheetName).appendRow(['fecha', 'cliente', 'telefono', 'direccion', 'cedula', 'ciudad', 'pais', 'empresaEnvio', 'total', 'detalles']);
       }
     } else if (sheetName === 'Productos') {
       var sheet = ss.getSheetByName('Productos');
@@ -28,6 +28,24 @@ function setupSheets() {
       if (headers.indexOf('tallas') === -1) {
         sheet.getRange(1, headers.length + 1).setValue('tallas');
       }
+    } else if (sheetName === 'Pedidos') {
+      var sheet = ss.getSheetByName('Pedidos');
+      var headers = sheet.getDataRange().getValues()[0];
+      if (headers.indexOf('cedula') === -1) {
+        sheet.getRange(1, headers.length + 1).setValue('cedula');
+      }
+      headers = sheet.getDataRange().getValues()[0];
+      if (headers.indexOf('ciudad') === -1) {
+        sheet.getRange(1, headers.length + 1).setValue('ciudad');
+      }
+      headers = sheet.getDataRange().getValues()[0];
+      if (headers.indexOf('pais') === -1) {
+        sheet.getRange(1, headers.length + 1).setValue('pais');
+      }
+      headers = sheet.getDataRange().getValues()[0];
+      if (headers.indexOf('empresaEnvio') === -1) {
+        sheet.getRange(1, headers.length + 1).setValue('empresaEnvio');
+      }
     }
   }
 }
@@ -40,28 +58,48 @@ function doPost(e) {
     
     if (data.action === "createOrder") {
       var sheet = ss.getSheetByName('Pedidos');
-      var detalles = data.cart.map(function(item) { return item.quantity + "x " + item.name; }).join(", ");
-      
+      var detalles = data.cart.map(function(item) { return item.quantity + "x " + item.name + (item.referencia ? " (" + item.referencia + ")" : ""); }).join(", ");
+
       sheet.appendRow([
         data.date,
         data.customer.name,
         data.customer.phone,
         data.customer.address,
+        data.customer.cedula || "",
+        data.customer.ciudad || "",
+        data.customer.pais || "",
+        data.customer.empresaEnvio || "",
         data.totalPrice,
         detalles
       ]);
-      
+
       var asunto = "NUEVO PEDIDO DE: " + data.customer.name;
       var mensaje = "";
       mensaje += "Se ha registrado un nuevo pedido.\n\n";
-      mensaje += "Cliente: " + data.customer.name + "\n";
+      mensaje += "DATOS DEL CLIENTE\n";
+      mensaje += "Nombre: " + data.customer.name + "\n";
       mensaje += "Tel\u00e9fono: " + data.customer.phone + "\n";
-      mensaje += "Direcci\u00f3n: " + data.customer.address + "\n\n";
+      mensaje += "C\u00e9dula/RIF: " + (data.customer.cedula || "N/A") + "\n";
+      mensaje += "Direcci\u00f3n: " + data.customer.address + "\n";
+      mensaje += "Ciudad: " + (data.customer.ciudad || "N/A") + "\n";
+      mensaje += "Pa\u00eds: " + (data.customer.pais || "N/A") + "\n";
+      mensaje += "Empresa de Env\u00edo: " + (data.customer.empresaEnvio || "N/A") + "\n\n";
       mensaje += "Productos: " + detalles + "\n\n";
       mensaje += "Total: $" + data.totalPrice;
-      
-      MailApp.sendEmail(ADMIN_EMAIL, asunto, mensaje);
-      
+
+      if (data.pdfBase64) {
+        var pdfBlob = Utilities.newBlob(
+          Utilities.base64Decode(data.pdfBase64),
+          "application/pdf",
+          "factura_hanna_accesorios.pdf"
+        );
+        MailApp.sendEmail(ADMIN_EMAIL, asunto, mensaje, {
+          attachments: [pdfBlob]
+        });
+      } else {
+        MailApp.sendEmail(ADMIN_EMAIL, asunto, mensaje);
+      }
+
       return ContentService.createTextOutput(JSON.stringify({ success: true }))
         .setMimeType(ContentService.MimeType.JSON);
     }

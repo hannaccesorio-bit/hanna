@@ -9,23 +9,31 @@ import toast from 'react-hot-toast';
 
 const Checkout = () => {
   const { cart, totalItems, totalPrice, clearCart, updateQuantity, removeFromCart, updateCartItem } = useCart();
-  const [customer, setCustomer] = useState({ name: '', phone: '', address: '' });
+  const [customer, setCustomer] = useState({ name: '', phone: '', address: '', cedula: '', ciudad: '', pais: '', empresaEnvio: '' });
   const [isProcessing, setIsProcessing] = useState(false);
 
-  const generatePDF = () => {
+  const generatePDF = (includeRef = false) => {
     const doc = new jsPDF();
     doc.setFontSize(20);
     doc.text('HANNA ACCESORIOS', 14, 22);
     doc.setFontSize(12);
     doc.text('TICKET DE COMPRA', 14, 30);
     doc.text(`Fecha: ${new Date().toLocaleDateString()}`, 14, 38);
-    doc.text(`Cliente: ${customer.name}`, 14, 50);
-    doc.text(`Teléfono: ${customer.phone}`, 14, 56);
-    doc.text(`Dirección: ${customer.address}`, 14, 62);
 
-    const tableColumn = ["Producto", "Color/Talla", "Cantidad", "Precio Unitario", "Subtotal"];
+    doc.setFontSize(10);
+    doc.text('DATOS DEL CLIENTE', 14, 48);
+    doc.text(`Nombre: ${customer.name}`, 14, 54);
+    doc.text(`Teléfono: ${customer.phone}`, 14, 60);
+    doc.text(`Cédula/RIF: ${customer.cedula}`, 14, 66);
+    doc.text(`Dirección: ${customer.address}`, 14, 72);
+    doc.text(`Ciudad: ${customer.ciudad}`, 14, 78);
+    doc.text(`País: ${customer.pais}`, 14, 84);
+    doc.text(`Empresa de Envío: ${customer.empresaEnvio}`, 14, 90);
+
+    const tableColumn = ["Producto", "Ref", "Color/Talla", "Cantidad", "Precio", "Subtotal"];
     const tableRows = cart.map(item => [
       item.name,
+      item.referencia || '-',
       [item.selectedColor, item.selectedTalla].filter(Boolean).join(' / ') || '-',
       item.quantity.toString(),
       `$${item.price}`,
@@ -33,17 +41,22 @@ const Checkout = () => {
     ]);
 
     autoTable(doc, {
-      startY: 70,
+      startY: 96,
       head: [tableColumn],
       body: tableRows,
       theme: 'grid',
       headStyles: { fillColor: [212, 175, 55] },
     });
 
-    const finalY = doc.lastAutoTable.finalY || 70;
+    const finalY = doc.lastAutoTable.finalY || 96;
     doc.setFontSize(14);
     doc.text(`Total a Pagar: $${totalPrice}`, 14, finalY + 15);
+
+    if (includeRef) {
+      return doc.output('datauristring');
+    }
     doc.save('factura_hanna_accesorios.pdf');
+    return null;
   };
 
   const handleCheckout = async (e) => {
@@ -56,18 +69,29 @@ const Checkout = () => {
     setIsProcessing(true);
 
     try {
-      generatePDF();
+      const pdfDataUri = generatePDF(true);
+      const pdfBase64 = pdfDataUri ? pdfDataUri.split(',')[1] : '';
+
       toast.success('Factura generada');
 
-      const orderResult = await sendOrder({ customer, cart, totalPrice, date: new Date().toISOString() });
+      const orderResult = await sendOrder({
+        customer,
+        cart,
+        totalPrice,
+        date: new Date().toISOString(),
+        pdfBase64
+      });
       if (!orderResult) {
         toast('No se pudo guardar en la nube, pero tu pedido se enviará por WhatsApp', { icon: '⚠️' });
       }
 
-      const message = `Hola Hanna Accesorios!%0AQuiero realizar un pedido.%0A%0AMi nombre: ${customer.name}%0ATeléfono: ${customer.phone}%0ADirección: ${customer.address}%0A%0APedido:%0A${cart.map(item => {
+      const itemsStr = cart.map(item => {
+        const ref = item.referencia ? ` (Ref: ${item.referencia})` : '';
         const variant = [item.selectedColor, item.selectedTalla].filter(Boolean).join(' - ');
-        return `- ${item.quantity}x ${item.name}${variant ? ' (' + variant + ')' : ''} ($${item.price * item.quantity})`;
-      }).join('%0A')}%0A%0A*Total: $${totalPrice}*%0A%0A¡Ya tengo la factura generada!`;
+        return `- ${item.quantity}x ${item.name}${ref}${variant ? ' (' + variant + ')' : ''} ($${item.price * item.quantity})`;
+      }).join('%0A');
+
+      const message = `Hola Hanna Accesorios!%0AQuiero realizar un pedido.%0A%0A*DATOS DEL CLIENTE*%0ANombre: ${customer.name}%0ATeléfono: ${customer.phone}%0ACédula/RIF: ${customer.cedula}%0ADirección: ${customer.address}%0ACiudad: ${customer.ciudad}%0APaís: ${customer.pais}%0AEmpresa de Envío: ${customer.empresaEnvio}%0A%0A*PEDIDO*%0A${itemsStr}%0A%0A*Total: $${totalPrice}*%0A%0A¡Ya tengo la factura generada!`;
       window.open(`https://wa.me/584123853699?text=${message}`, '_blank');
 
       clearCart();
@@ -153,7 +177,13 @@ const Checkout = () => {
           <form onSubmit={handleCheckout} style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginTop: '1rem' }}>
             <input type="text" placeholder="Nombre Completo" className="input-field" value={customer.name} onChange={e => setCustomer({...customer, name: e.target.value})} required />
             <input type="tel" placeholder="Teléfono / WhatsApp" className="input-field" value={customer.phone} onChange={e => setCustomer({...customer, phone: e.target.value})} required />
+            <input type="text" placeholder="Cédula / RIF" className="input-field" value={customer.cedula} onChange={e => setCustomer({...customer, cedula: e.target.value})} />
             <input type="text" placeholder="Dirección de Envío" className="input-field" value={customer.address} onChange={e => setCustomer({...customer, address: e.target.value})} />
+            <div style={{ display: 'flex', gap: '0.75rem' }}>
+              <input type="text" placeholder="Ciudad" className="input-field" value={customer.ciudad} onChange={e => setCustomer({...customer, ciudad: e.target.value})} style={{ flex: 1 }} />
+              <input type="text" placeholder="País" className="input-field" value={customer.pais} onChange={e => setCustomer({...customer, pais: e.target.value})} style={{ flex: 1 }} />
+            </div>
+            <input type="text" placeholder="Empresa de Envío (Ej. MRW, Zoom, Domesa)" className="input-field" value={customer.empresaEnvio} onChange={e => setCustomer({...customer, empresaEnvio: e.target.value})} />
 
             <hr style={{ margin: '1rem 0', borderColor: 'var(--color-border)' }} />
             <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 'bold', fontSize: '1.5rem', marginBottom: '1rem' }}>
