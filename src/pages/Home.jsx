@@ -42,7 +42,7 @@ const Home = () => {
 
   const filtered = useMemo(() => {
     return products.filter((p) => {
-      const name = (p.nombre || p.name || '').toLowerCase();
+      const name = String(p.nombre || p.name || '').toLowerCase();
       const ref = String(p.referencia || '').toLowerCase();
       const id = String(p.id || '');
       const matchesSearch = !searchQuery || name.includes(searchQuery.toLowerCase()) || ref.includes(searchQuery.toLowerCase()) || id.includes(searchQuery.toLowerCase());

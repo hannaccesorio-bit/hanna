@@ -220,7 +220,7 @@ const Admin = () => {
   };
 
   const filtered = allProducts.filter(p => {
-    const name = (p.nombre || p.name || '').toLowerCase();
+    const name = String(p.nombre || p.name || '').toLowerCase();
     return !searchQuery || name.includes(searchQuery.toLowerCase());
   });
 
