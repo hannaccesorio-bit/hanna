@@ -24,8 +24,12 @@ const Admin = () => {
 
   const [allProducts, setAllProducts] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
-  const [categories, setCategories] = useState([]);
-  const [departments, setDepartments] = useState([]);
+  const [categories, setCategories] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('hanna_categories') || '[]'); } catch { return []; }
+  });
+  const [departments, setDepartments] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('hanna_departments') || '[]'); } catch { return []; }
+  });
   const [newCategory, setNewCategory] = useState('');
   const [newDepartment, setNewDepartment] = useState('');
 
@@ -47,14 +51,19 @@ const Admin = () => {
   }, [tallasMaster]);
 
   useEffect(() => {
-    localStorage.setItem(TRASH_KEY, JSON.stringify(trashed));
-  }, [trashed]);
+    localStorage.setItem('hanna_categories', JSON.stringify(categories));
+  }, [categories]);
+
+  useEffect(() => {
+    localStorage.setItem('hanna_departments', JSON.stringify(departments));
+  }, [departments]);
 
   const loadProducts = async () => {
     const data = await fetchProducts();
     if (Array.isArray(data)) {
       setAllProducts(data);
-      const cats = new Set(); const deps = new Set();
+      const cats = new Set(categories);
+      const deps = new Set(departments);
       data.forEach(p => {
         if (p.categoria || p.category) cats.add(p.categoria || p.category);
         if (p.departamento || p.department) deps.add(p.departamento || p.department);
