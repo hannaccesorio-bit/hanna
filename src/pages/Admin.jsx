@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { loginAdmin, createProduct, uploadImageToImgBB, recoverPassword, fetchProducts } from '../services/api';
+import { loginAdmin, createProduct, uploadImageToImgBB, recoverPassword, fetchProducts, deleteProduct as deleteProductApi } from '../services/api';
 import AdminOrders from './AdminOrders';
 import { Trash2, RotateCcw, Search, X, Check } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -128,12 +128,17 @@ const Admin = () => {
 
   const handleDeleteProduct = async (item) => {
     if (!window.confirm(`¿Eliminar "${item.nombre || item.name}"?`)) return;
+    const ok = await deleteProductApi(item.id);
+    if (ok) {
+      toast.success('Producto eliminado de la nube');
+    } else {
+      toast('No se pudo eliminar de la nube, se guarda en papelera local', { icon: '⚠️' });
+    }
     const trash = JSON.parse(localStorage.getItem(TRASH_KEY) || '[]');
     trash.push(item);
     localStorage.setItem(TRASH_KEY, JSON.stringify(trash));
     setTrashed(trash);
     setAllProducts(prev => prev.filter(p => p.id !== item.id));
-    toast('Producto movido a papelera', { icon: '🗑️' });
   };
 
   const handleRestoreProduct = (item) => {
